@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UIBlocks — Component Library | Live Preview + Editor</title>
+<meta name="description" content="Production-ready UI component library with live prop editing, 4-format code output (HTML, CSS, Tailwind, React), save, share, random generator and daily challenges.">
+<meta property="og:title" content="UIBlocks — Editable Component Library">
+<meta property="og:description" content="Live-editable UI components. Edit colors, spacing, shadows. Copy as HTML, CSS, Tailwind or React. Save, share, challenge.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────── */
+:root{
+  /* shared */
+  --accent:#5558f0;--accent2:#a78bfa;--volt:#f5e642;
+  --green:#22c55e;--red:#ef4444;--amber:#f59e0b;
+  --display:'Bebas Neue',sans-serif;
+  --mono:'Space Mono',monospace;
+  --sans:'Barlow Condensed',sans-serif;
+  --sidebar-w:248px;--header-h:52px;--panel-w:300px;
+  --t:all .18s ease;
+  --radius:0px;
+}
+/* ── DARK THEME (default) ── */
+[data-theme="dark"]{
+  --bg:#080807;--surface:#111110;--surface2:#191918;--surface3:#222220;
+  --text:#f0ede8;--text2:#a09890;--text3:#8a8580;
+  --rule:rgba(240,237,232,.07);--rule-s:rgba(240,237,232,.14);
+  --ink-faint:rgba(240,237,232,.025);
+  --shadow:rgba(0,0,0,.45);
+  --cc-preview-bg:#0a0a09;
+}
+/* ── LIGHT THEME ── */
+[data-theme="light"]{
+  --bg:#f5f2ed;--surface:#ede9e2;--surface2:#e2ddd7;--surface3:#d5cfc8;
+  --text:#0f0e0d;--text2:#4a4540;--text3:#636059;
+  --rule:rgba(15,14,13,.08);--rule-s:rgba(15,14,13,.15);
+  --ink-faint:rgba(15,14,13,.025);
+  --shadow:rgba(0,0,0,.12);
+  --cc-preview-bg:#e8e4de;
+}
+/* ── System preference fallback ── */
+@media(prefers-color-scheme:light){
+  :root:not([data-theme]){
+    --bg:#f5f2ed;--surface:#ede9e2;--surface2:#e2ddd7;--surface3:#d5cfc8;
+    --text:#0f0e0d;--text2:#4a4540;--text3:#636059;
+    --rule:rgba(15,14,13,.08);--rule-s:rgba(15,14,13,.15);
+    --ink-faint:rgba(15,14,13,.025);
+    --shadow:rgba(0,0,0,.12);
+    --cc-preview-bg:#e8e4de;
+  }
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100%;overflow:hidden;display:flex;flex-direction:column;transition:background .22s,color .22s}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule-s);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* ── HEADER ─────────────────────────────── */
+.header{height:var(--header-h);display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 16px;border-bottom:1px solid var(--rule-s);background:var(--bg);flex-shrink:0;gap:12px;z-index:50}
+.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand-logo{font-family:var(--display);font-size:28px;letter-spacing:.06em;line-height:1;color:var(--text)}
+.brand-logo span{color:var(--accent)}
+.brand-tag{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);padding:3px 8px;border:1px solid var(--rule-s)}
+.header-search{flex:1;max-width:360px;display:flex;align-items:center;background:var(--surface);border:1px solid var(--rule-s);gap:8px;padding:0 12px;transition:border-color .15s}
+.header-search:focus-within{border-color:var(--accent)}
+.header-search input{flex:1;background:none;border:none;outline:none;font-family:var(--mono);font-size:11px;color:var(--text);padding:8px 0}
+.header-search input::placeholder{color:var(--text3)}
+.header-search-icon{color:var(--text3);font-size:13px;flex-shrink:0}
+.header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.hbtn{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;padding:6px 14px;border:1px solid var(--rule-s);color:var(--text3);transition:var(--t);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.hbtn:hover{border-color:var(--accent);color:var(--accent)}
+.hbtn.active,.hbtn-volt{border-color:var(--volt);color:var(--volt)}
+.hbtn-volt:hover{background:var(--volt);color:#000}
+.hbtn-accent{border-color:var(--accent);color:var(--accent)}
+.hbtn-accent:hover{background:var(--accent);color:#fff}
+.saved-count{background:var(--accent);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;font-family:var(--mono);min-width:14px;text-align:center}
+
+/* ── LAYOUT ─────────────────────────────── */
+.app-body{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ─────────────────────────────── */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;border-right:1px solid var(--rule-s);display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+.sidebar-hd{padding:12px 14px 8px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sidebar-hd-label{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--text3)}
+.sidebar-hd-count{font-family:var(--mono);font-size:9px;color:var(--accent)}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:8px 0}
+.sidebar-cat-hd{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--text3);padding:10px 14px 4px;display:flex;align-items:center;gap:8px}
+.sidebar-cat-hd::after{content:'';flex:1;height:1px;background:var(--rule)}
+.sidebar-item{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--text3);cursor:pointer;transition:var(--t);gap:8px}
+.sidebar-item:hover{color:var(--text2);background:var(--ink-faint)}
+.sidebar-item.active{color:var(--accent);background:rgba(85,88,240,.07);border-left:2px solid var(--accent);padding-left:12px}
+.sidebar-item .si-count{font-size:8.5px;background:var(--surface3);border:1px solid var(--rule-s);padding:1px 6px;color:var(--text3);flex-shrink:0}
+.sidebar-item.active .si-count{background:rgba(85,88,240,.15);border-color:rgba(85,88,240,.3);color:var(--accent)}
+
+/* ── MAIN CONTENT ────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.main-toolbar{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--rule);flex-shrink:0;gap:12px;background:var(--surface)}
+.toolbar-left{display:flex;align-items:center;gap:8px}
+.toolbar-title{font-family:var(--display);font-size:22px;letter-spacing:.05em;color:var(--text)}
+.toolbar-title span{color:var(--accent)}
+.toolbar-pill{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--rule-s);color:var(--text3)}
+.toolbar-right{display:flex;align-items:center;gap:6px}
+.view-toggle{display:flex;border:1px solid var(--rule-s)}
+.vt-btn{font-family:var(--mono);font-size:10px;padding:5px 10px;color:var(--text3);transition:var(--t);border-right:1px solid var(--rule-s)}
+.vt-btn:last-child{border-right:none}
+.vt-btn:hover{color:var(--text2)}
+.vt-btn.active{background:var(--surface3);color:var(--text)}
+.tbtn{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border:1px solid var(--rule-s);color:var(--text3);transition:var(--t);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tbtn:hover{border-color:var(--accent);color:var(--accent)}
+.tbtn.volt{border-color:var(--volt);color:var(--volt)}
+.tbtn.volt:hover{background:var(--volt);color:#000}
+
+/* ── COMPONENT GRID ──────────────────────── */
+.comp-area{flex:1;overflow-y:auto;padding:20px}
+.comp-grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.comp-list-view{display:flex;flex-direction:column;gap:8px}
+
+/* ── COMPONENT CARD ──────────────────────── */
+.cc{background:var(--surface);border:1px solid var(--rule-s);display:flex;flex-direction:column;transition:border-color .18s,box-shadow .18s;position:relative;overflow:hidden}
+.cc:hover{border-color:rgba(85,88,240,.4);box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.cc-top-bar{height:2px;background:var(--cc-color,var(--accent));transform:scaleX(0);transform-origin:left;transition:transform .25s}
+.cc:hover .cc-top-bar{transform:scaleX(1)}
+.cc-preview{background:var(--bg);min-height:160px;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;cursor:pointer}
+.cc-preview-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(240,237,232,.03) 23px,rgba(240,237,232,.03) 24px),repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(240,237,232,.03) 23px,rgba(240,237,232,.03) 24px);pointer-events:none}
+.cc-preview iframe{width:100%;height:140px;border:none;pointer-events:none;background:var(--cc-preview-bg)}
+.cc-preview .cc-expand-hint{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#fff;opacity:0;transition:opacity .15s}
+.cc:hover .cc-expand-hint{opacity:1}
+.cc-meta{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--rule);gap:8px}
+.cc-name{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--text)}
+.cc-tags{display:flex;gap:4px;flex-wrap:wrap}
+.cc-tag{font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--rule-s);color:var(--text3);background:var(--surface2)}
+.cc-actions{padding:8px 14px 12px;display:flex;gap:6px;border-top:1px solid var(--rule)}
+.cc-btn{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--rule-s);color:var(--text3);transition:var(--t);flex:1;text-align:center}
+.cc-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cc-btn.primary{border-color:var(--accent);color:var(--accent)}
+.cc-btn.primary:hover{background:var(--accent);color:#fff}
+.cc-btn.saved{border-color:var(--green);color:var(--green)}
+
+/* ── LIST VIEW CARD ──────────────────────── */
+.cc-list{background:var(--surface);border:1px solid var(--rule-s);display:flex;align-items:center;gap:14px;padding:12px 16px;transition:border-color .15s;cursor:pointer}
+.cc-list:hover{border-color:rgba(85,88,240,.4)}
+.cc-list-preview{width:80px;height:48px;flex-shrink:0;background:var(--bg);border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cc-list-name{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.cc-list-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cc-list-actions{display:flex;gap:6px;margin-left:auto;flex-shrink:0}
+
+/* ── DETAIL MODAL ────────────────────────── */
+.detail-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;backdrop-filter:blur(6px)}
+.detail-backdrop.open{display:flex}
+.detail-panel{position:absolute;inset:0;display:flex;flex-direction:column}
+.detail-header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--rule-s);background:var(--surface);flex-shrink:0;gap:12px}
+.detail-title{font-family:var(--display);font-size:26px;letter-spacing:.04em;color:var(--text)}
+.detail-close{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;padding:6px 14px;border:1px solid var(--rule-s);color:var(--text3);transition:var(--t)}
+.detail-close:hover{border-color:var(--text3);color:var(--text)}
+.detail-body{display:flex;flex:1;overflow:hidden}
+
+/* preview pane */
+.detail-preview-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--rule-s)}
+.dp-toolbar{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--rule);background:var(--surface2);flex-shrink:0}
+.dp-toolbar-left{display:flex;align-items:center;gap:6px}
+.dp-label{font-family:var(--mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)}
+.dp-variant-select{font-family:var(--mono);font-size:9px;background:var(--surface);border:1px solid var(--rule-s);color:var(--text);padding:3px 8px;outline:none;cursor:pointer;transition:border-color .15s}
+.dp-variant-select:focus{border-color:var(--accent)}
+.dp-bg-toggle{display:flex;border:1px solid var(--rule-s)}
+.dp-bg-btn{font-family:var(--mono);font-size:9px;padding:3px 8px;color:var(--text3);border-right:1px solid var(--rule-s);transition:var(--t)}
+.dp-bg-btn:last-child{border-right:none}
+.dp-bg-btn.active{background:var(--surface3);color:var(--text)}
+.dp-preview-area{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:32px;background:var(--bg);position:relative}
+.dp-preview-area.bg-white{background:#ffffff}
+.dp-preview-area.bg-gray{background:#f3f4f6}
+.dp-preview-area.bg-dark{background:#0f0e0d}
+.dp-preview-area.bg-checker{background-image:repeating-conic-gradient(rgba(255,255,255,.05) 0% 25%,transparent 0% 50%);background-size:20px 20px}
+.dp-preview-inner{max-width:860px;width:100%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+
+/* editor pane */
+.detail-editor-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+.ep-section{border-bottom:1px solid var(--rule);flex-shrink:0}
+.ep-section-hd{font-family:var(--mono);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--text3);padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;transition:background .12s}
+.ep-section-hd:hover{background:rgba(240,237,232,.03)}
+.ep-section-hd::before{content:'';width:3px;height:10px;background:var(--accent);display:block}
+.ep-section-hd .ep-arrow{margin-left:auto;transition:transform .2s;font-size:10px;color:var(--text3)}
+.ep-section-body{padding:10px 14px 12px;display:flex;flex-direction:column;gap:10px}
+.ep-section.collapsed .ep-section-body{display:none}
+.ep-section.collapsed .ep-arrow{transform:rotate(-90deg)}
+
+/* prop controls */
+.prop-row{display:flex;flex-direction:column;gap:5px}
+.prop-label{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;justify-content:space-between}
+.prop-val{color:var(--text2);font-weight:700}
+.prop-color{display:flex;align-items:center;gap:8px}
+.prop-color input[type=color]{width:32px;height:28px;border:1px solid var(--rule-s);background:var(--bg);cursor:pointer;padding:2px}
+.prop-color input[type=text]{flex:1;font-family:var(--mono);font-size:10px;background:var(--bg);border:1px solid var(--rule-s);padding:5px 8px;color:var(--text);outline:none;transition:border-color .15s}
+.prop-color input[type=text]:focus{border-color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);height:3px;cursor:pointer}
+.prop-select{width:100%;font-family:var(--mono);font-size:10px;background:var(--bg);border:1px solid var(--rule-s);color:var(--text);padding:6px 8px;outline:none;cursor:pointer;appearance:none;transition:border-color .15s}
+.prop-select:focus{border-color:var(--accent)}
+.prop-chips{display:flex;gap:4px;flex-wrap:wrap}
+.prop-chip{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--rule-s);color:var(--text3);cursor:pointer;transition:var(--t)}
+.prop-chip:hover{color:var(--text2);border-color:var(--text3)}
+.prop-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.prop-toggle-row{display:flex;align-items:center;justify-content:space-between}
+.prop-toggle{width:36px;height:20px;background:var(--surface3);border:1px solid var(--rule-s);position:relative;cursor:pointer;transition:all .18s;flex-shrink:0}
+.prop-toggle::after{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;background:var(--text3);transition:all .18s}
+.prop-toggle.on{background:var(--accent);border-color:var(--accent)}
+.prop-toggle.on::after{left:18px;background:#fff}
+.ep-reset-btn{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;border:1px solid var(--rule-s);color:var(--text3);width:100%;transition:var(--t);margin-top:4px}
+.ep-reset-btn:hover{border-color:var(--amber);color:var(--amber)}
+
+/* code panel */
+.detail-code-pane{flex-shrink:0;border-top:1px solid var(--rule-s);background:var(--bg)}
+.code-tabs{display:flex;border-bottom:1px solid var(--rule-s)}
+.code-tab{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;padding:8px 16px;color:var(--text3);cursor:pointer;border-right:1px solid var(--rule);transition:color .15s;position:relative;flex:1;text-align:center}
+.code-tab::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:transparent;transition:background .15s}
+.code-tab:hover{color:var(--text2)}
+.code-tab.active{color:var(--text);background:var(--surface)}
+.code-tab[data-tab=html].active::after{background:#f97316}
+.code-tab[data-tab=css].active::after{background:var(--accent)}
+.code-tab[data-tab=tailwind].active::after{background:#06b6d4}
+.code-tab[data-tab=react].active::after{background:#61dafb}
+.code-pane{display:none;max-height:180px;overflow:auto}
+.code-pane.active{display:block}
+.code-block{font-family:var(--mono);font-size:11px;line-height:1.7;padding:14px 16px;white-space:pre-wrap;word-break:break-all;color:var(--text2)}
+.code-block .kw{color:#c792ea}.code-block .str{color:#c3e88d}.code-block .cm{color:var(--text3);font-style:italic}.code-block .attr{color:#89ddff}.code-block .cls{color:#82aaff}.code-block .val{color:#f78c6c}
+.code-actions{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-top:1px solid var(--rule);background:var(--surface)}
+.code-meta{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.code-btns{display:flex;gap:6px}
+.code-copy{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border:1px solid var(--accent);color:var(--accent);transition:var(--t)}
+.code-copy:hover,.code-copy.done{background:var(--accent);color:#fff}
+.code-share{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--rule-s);color:var(--text3);transition:var(--t)}
+.code-share:hover{border-color:var(--text3);color:var(--text)}
+
+/* ── CHALLENGE PANEL ─────────────────────── */
+.challenge-bar{background:var(--surface);border-bottom:1px solid var(--rule-s);padding:10px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.challenge-tag{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:3px 10px;background:rgba(245,230,66,.12);border:1px solid rgba(245,230,66,.3);color:var(--volt)}
+.challenge-text{font-family:var(--sans);font-size:13px;font-style:italic;color:var(--text2);flex:1}
+.challenge-text strong{color:var(--volt);font-style:normal}
+.challenge-timer{font-family:var(--mono);font-size:16px;color:var(--volt);letter-spacing:.08em;flex-shrink:0}
+.challenge-skip{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;border:1px solid rgba(245,230,66,.3);color:var(--volt);transition:var(--t)}
+.challenge-skip:hover{background:rgba(245,230,66,.1)}
+
+/* ── SAVED PANEL ─────────────────────────── */
+.saved-panel{position:fixed;top:var(--header-h);right:-340px;width:320px;height:calc(100vh - var(--header-h));background:var(--surface);border-left:1px solid var(--rule-s);z-index:100;transition:right .3s ease;display:flex;flex-direction:column}
+.saved-panel.open{right:0}
+.saved-panel-hd{padding:14px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.saved-panel-title{font-family:var(--display);font-size:22px;letter-spacing:.04em;color:var(--text)}
+.saved-panel-close{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--rule-s);color:var(--text3);transition:var(--t)}
+.saved-panel-close:hover{border-color:var(--text3);color:var(--text)}
+.saved-list{flex:1;overflow-y:auto;padding:12px}
+.saved-item{background:var(--surface2);border:1px solid var(--rule-s);margin-bottom:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:border-color .15s}
+.saved-item:hover{border-color:rgba(85,88,240,.4)}
+.saved-item-name{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--text);flex:1}
+.saved-item-cat{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.saved-item-remove{font-family:var(--mono);font-size:12px;color:var(--text3);cursor:pointer;transition:color .15s;flex-shrink:0}
+.saved-item-remove:hover{color:var(--red)}
+.saved-empty{text-align:center;padding:40px 20px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)}
+.saved-actions{padding:12px;border-top:1px solid var(--rule);display:flex;gap:8px;flex-shrink:0}
+.saved-export{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;padding:7px 0;border:1px solid var(--rule-s);color:var(--text3);flex:1;text-align:center;transition:var(--t)}
+.saved-export:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── EMPTY / LOADING STATES ──────────────── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;padding:40px}
+.empty-icon{font-size:40px;opacity:.4}
+.empty-title{font-family:var(--display);font-size:32px;letter-spacing:.04em;color:var(--text);opacity:.4}
+.empty-desc{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);text-align:center}
+
+/* ── RANDOM GENERATOR ────────────────────── */
+.rng-flash{animation:rngFlash .4s ease both}
+@keyframes rngFlash{0%{opacity:0;transform:scale(.97)}100%{opacity:1;transform:scale(1)}}
+
+/* ── MISC ────────────────────────────────── */
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dot-green{background:var(--green)}
+.dot-volt{background:var(--volt)}
+.dot-accent{background:var(--accent)}
+.badge{font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border:1px solid}
+.badge-new{color:var(--volt);border-color:rgba(245,230,66,.4);background:rgba(245,230,66,.08)}
+.kbd{font-family:var(--mono);font-size:9px;padding:2px 6px;border:1px solid var(--rule-s);background:var(--surface2);color:var(--text3)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.anim-in{animation:fadeIn .25s ease both}
+.anim-in:nth-child(2){animation-delay:.04s}
+.anim-in:nth-child(3){animation-delay:.08s}
+.anim-in:nth-child(4){animation-delay:.12s}
+.anim-in:nth-child(5){animation-delay:.16s}
+.anim-in:nth-child(6){animation-delay:.20s}
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .detail-editor-pane{width:260px}
+  .header-search{display:none}
+}
+
+/* ── ENHANCED POLISH ─────────────────────────────────── */
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+.header{animation:slideUp .3s ease both}
+.sidebar{animation:slideRight .3s .05s ease both}
+.main{animation:slideUp .3s .08s ease both}
+*:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cc{transform:translateY(0);transition:border-color .18s,box-shadow .22s,transform .22s}
+.cc:hover{transform:translateY(-3px);box-shadow:0 8px 32px var(--shadow),0 2px 8px rgba(85,88,240,.12)}
+[data-theme="light"] .cc:hover{box-shadow:0 8px 24px rgba(0,0,0,.1),0 2px 8px rgba(85,88,240,.08)}
+.brand-logo{background:linear-gradient(135deg,var(--text) 40%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+[data-theme="light"] .brand-logo{background:linear-gradient(135deg,var(--text) 30%,var(--accent));-webkit-background-clip:text;background-clip:text}
+.sidebar-item{border-left:2px solid transparent;transition:color .15s,background .15s,border-color .15s,padding-left .15s}
+.sidebar-item.active{border-left-color:var(--accent)}
+.sidebar-item:hover:not(.active){border-left-color:rgba(85,88,240,.3)}
+.header-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(85,88,240,.12)}
+.code-tab{position:relative}
+.code-tab::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--tab-c,var(--accent));transform:scaleX(0);transition:transform .2s}
+.code-tab.active::before{transform:scaleX(1)}
+.code-tab[data-tab=html]{--tab-c:#f97316}
+.code-tab[data-tab=css]{--tab-c:var(--accent)}
+.code-tab[data-tab=tailwind]{--tab-c:#06b6d4}
+.code-tab[data-tab=react]{--tab-c:#61dafb}
+.copy-flash{animation:copyFlash .5s ease both}
+@keyframes copyFlash{0%{background:rgba(85,88,240,.2)}100%{background:transparent}}
+.toast-flash{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1.5px solid var(--accent);color:var(--text);font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:10px 20px;z-index:9999;animation:toastPop .25s ease both;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px var(--shadow)}
+@keyframes toastPop{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.skeleton-card{background:var(--surface);border:1px solid var(--rule-s);height:240px}
+.skeleton-block{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
+.ep-section-hd{background:var(--surface2)}
+.ep-section-hd:hover{background:var(--surface3)}
+.prop-row+.prop-row{padding-top:8px;border-top:1px solid var(--rule)}
+.detail-backdrop{transition:opacity .2s;display:flex!important}
+.detail-backdrop:not(.open){opacity:0;pointer-events:none}
+.detail-backdrop.open{opacity:1}
+.detail-panel{animation:popIn .22s ease both}
+.saved-panel{transition:right .28s cubic-bezier(.4,0,.2,1)}
+.dp-preview-area{transition:background .2s}
+.dp-preview-area.bg-checker{background-color:var(--surface2);background-image:repeating-conic-gradient(var(--surface3) 0% 25%,transparent 0% 50%);background-size:20px 20px}
+.mobile-sidebar-toggle{display:none;font-family:var(--mono);font-size:18px;padding:6px 10px;border:1px solid var(--rule-s);color:var(--text3);background:none;cursor:pointer;transition:var(--t)}
+.mobile-sidebar-toggle:hover{color:var(--text)}
+@media(max-width:900px){
+  .mobile-sidebar-toggle{display:flex;align-items:center}
+  .sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;z-index:80;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  .sidebar.mobile-open{transform:translateX(0);box-shadow:8px 0 32px var(--shadow)}
+  .sidebar-overlay{display:none;position:fixed;inset:0;top:var(--header-h);background:rgba(0,0,0,.5);z-index:79}
+  .sidebar-overlay.open{display:block}
+}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--rule-s)}
+@media print{
+  .header,.sidebar,.saved-panel,.detail-backdrop,.mobile-sidebar-toggle,.challenge-bar{display:none!important}
+  .comp-area{overflow:visible;height:auto}
+  .cc{break-inside:avoid}
+}
+.sidebar,.main-toolbar,.detail-header,.detail-editor-pane,.ep-section,.code-actions,.code-tabs,.header,.cc,.cc-meta,.cc-actions,.ep-section-hd,.saved-panel,.challenge-bar{transition:background .22s,border-color .22s,color .22s}
+.bp-bar{display:flex;align-items:center;gap:4px;padding:0 16px;height:36px;border-bottom:1px solid var(--rule);background:var(--surface2);flex-shrink:0;overflow-x:auto}
+.bp-btn{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--rule-s);color:var(--text3);cursor:pointer;transition:var(--t);white-space:nowrap}
+.bp-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bp-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.recent-strip{display:flex;align-items:center;gap:6px;padding:8px 14px;border-bottom:1px solid var(--rule);background:var(--surface);flex-shrink:0}
+.recent-label{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--text3)}
+.recent-item{font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;padding:3px 9px;border:1px solid var(--rule-s);color:var(--text3);cursor:pointer;transition:var(--t);white-space:nowrap}
+.recent-item:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- SKIP LINK -->
+<a href="#main-content" style="position:absolute;top:-40px;left:0;background:var(--accent);color:#fff;padding:8px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;z-index:999;transition:top .2s" onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Skip to content</a>
+
+<!-- HEADER -->
+<header class="header" role="banner">
+  <div class="header-brand">
+    <div class="brand-logo">UI<span>BLOCKS</span></div>
+    <div class="brand-tag">Component Library</div>
+  </div>
+  <div class="header-search" role="search">
+    <span class="header-search-icon" aria-hidden="true">⌕</span>
+    <input type="search" id="globalSearch" placeholder="Search components… (⌘K)" aria-label="Search all components" oninput="searchComps(this.value)" autocomplete="off">
+    <span class="kbd" aria-hidden="true">⌘K</span>
+  </div>
+  <div class="header-actions">
+    <button class="hbtn hbtn-volt" id="challengeBtn" onclick="toggleChallenge()" aria-label="Toggle daily challenge mode">⚡ Challenge</button>
+    <button class="hbtn" id="rngBtn" onclick="randomComp()" aria-label="Open random component" title="Random component">🎲 Random</button>
+    <button class="hbtn hbtn-accent" id="savedBtn" onclick="toggleSaved()" aria-label="Open saved components">
+      ★ Saved <span class="saved-count" id="savedCount">0</span>
+    </button>
+    <button class="hbtn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle light and dark theme" title="Toggle theme">☀ / ☾</button>
+    <a href="uiforge.html" class="hbtn" aria-label="Back to UIForge CSS tools">← UIForge</a>
+  </div>
+</header>
+
+<!-- CHALLENGE BAR (hidden by default) -->
+<div class="challenge-bar" id="challengeBar" style="display:none" role="banner" aria-live="polite">
+  <div class="challenge-tag">⚡ Daily Challenge</div>
+  <div class="challenge-text" id="challengeText">Loading challenge…</div>
+  <div class="challenge-timer" id="challengeTimer">05:00</div>
+  <button class="challenge-skip" onclick="nextChallenge()" aria-label="Skip to next challenge">Skip →</button>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" aria-label="Component categories">
+    <div class="sidebar-hd">
+      <span class="sidebar-hd-label">Categories</span>
+      <span class="sidebar-hd-count" id="sidebarCount">0 components</span>
+    </div>
+    <div class="sidebar-scroll" id="sidebarNav" role="list"></div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main" id="main-content">
+    <div class="main-toolbar">
+      <div class="toolbar-left">
+        <div class="toolbar-title" id="toolbarTitle">ALL <span>COMPONENTS</span></div>
+        <div class="toolbar-pill" id="toolbarCount">0</div>
+      </div>
+      <div class="toolbar-right">
+        <div class="view-toggle" role="group" aria-label="View mode">
+          <button class="vt-btn active" id="vt-grid" onclick="setView('grid')" aria-label="Grid view">⊞ Grid</button>
+          <button class="vt-btn" id="vt-list" onclick="setView('list')" aria-label="List view">≡ List</button>
+        </div>
+        <button class="tbtn volt" onclick="randomComp()" aria-label="Randomise component">🎲 Randomise</button>
+        <button class="tbtn" id="filterNewBtn" onclick="filterNew()" aria-label="Show new components">
+          <span class="dot dot-volt"></span> New
+        </button>
+      </div>
+    </div>
+    <div class="comp-area" id="compArea" role="list" aria-label="Component cards"></div>
+  </main>
+</div>
+
+<!-- SAVED PANEL -->
+<aside class="saved-panel" id="savedPanel" aria-label="Saved components">
+  <div class="saved-panel-hd">
+    <div class="saved-panel-title">SAVED</div>
+    <button class="saved-panel-close" onclick="toggleSaved()" aria-label="Close saved panel">✕ Close</button>
+  </div>
+  <div class="saved-list" id="savedList" role="list"></div>
+  <div class="saved-actions">
+    <button class="saved-export" onclick="exportSaved('html')" aria-label="Export saved as HTML">↓ HTML</button>
+    <button class="saved-export" onclick="exportSaved('json')" aria-label="Export saved as JSON">↓ JSON</button>
+    <button class="saved-export" onclick="clearSaved()" style="color:var(--red);border-color:rgba(239,68,68,.3)" aria-label="Clear all saved">Clear all</button>
+  </div>
+</aside>
+
+<!-- DETAIL MODAL -->
+<div class="detail-backdrop" id="detailBackdrop" role="dialog" aria-modal="true" aria-labelledby="detailTitle" onclick="closeDetail(event)">
+  <div class="detail-panel">
+    <div class="detail-header">
+      <div class="detail-title" id="detailTitle">Component</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="hbtn" id="detailSaveBtn" onclick="toggleSaveComp()" aria-label="Save component">★ Save</button>
+        <button class="hbtn" onclick="shareComp()" aria-label="Share component">⬀ Share</button>
+        <button class="detail-close" onclick="closeDetail()" aria-label="Close detail view">✕ Close</button>
+      </div>
+    </div>
+    <div class="detail-body">
+      <!-- Preview pane -->
+      <div class="detail-preview-pane">
+        <div class="dp-toolbar">
+          <div class="dp-toolbar-left">
+            <span class="dp-label">Variant:</span>
+            <select class="dp-variant-select" id="variantSelect" onchange="changeVariant(this.value)" aria-label="Select component variant"></select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="dp-label">Background:</span>
+            <div class="dp-bg-toggle" role="group" aria-label="Preview background">
+              <button class="dp-bg-btn active" data-bg="bg-dark" onclick="setBg(this,'bg-dark')" aria-label="Dark background">Dark</button>
+              <button class="dp-bg-btn" data-bg="bg-white" onclick="setBg(this,'bg-white')" aria-label="White background">White</button>
+              <button class="dp-bg-btn" data-bg="bg-gray" onclick="setBg(this,'bg-gray')" aria-label="Gray background">Gray</button>
+              <button class="dp-bg-btn" data-bg="bg-checker" onclick="setBg(this,'bg-checker')" aria-label="Checker background">Check</button>
+            </div>
+          </div>
+        </div>
+        <div class="dp-preview-area bg-dark" id="dpPreviewArea">
+          <div class="dp-preview-inner" id="dpPreviewInner" aria-live="polite"></div>
+        </div>
+        <!-- Code panel inside preview pane -->
+        <div class="detail-code-pane">
+          <div class="code-tabs" role="tablist">
+            <button class="code-tab active" data-tab="html" onclick="switchCodeTab('html',this)" role="tab" aria-selected="true">HTML</button>
+            <button class="code-tab" data-tab="css" onclick="switchCodeTab('css',this)" role="tab" aria-selected="false">CSS</button>
+            <button class="code-tab" data-tab="tailwind" onclick="switchCodeTab('tailwind',this)" role="tab" aria-selected="false">Tailwind</button>
+            <button class="code-tab" data-tab="react" onclick="switchCodeTab('react',this)" role="tab" aria-selected="false">React</button>
+          </div>
+          <div class="code-pane active" id="code-html" role="tabpanel"><div class="code-block" id="codeHtml"></div></div>
+          <div class="code-pane" id="code-css" role="tabpanel"><div class="code-block" id="codeCss"></div></div>
+          <div class="code-pane" id="code-tailwind" role="tabpanel"><div class="code-block" id="codeTailwind"></div></div>
+          <div class="code-pane" id="code-react" role="tabpanel"><div class="code-block" id="codeReact"></div></div>
+          <div class="code-actions">
+            <span class="code-meta" id="codeMeta">HTML · 0 lines</span>
+            <div class="code-btns">
+              <button class="code-share" onclick="shareComp()" aria-label="Copy share link">⬀ Share</button>
+              <button class="code-copy" id="codeCopyBtn" onclick="copyCode()" aria-label="Copy code to clipboard">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Editor pane -->
+      <div class="detail-editor-pane">
+        <div class="ep-section" id="epProps">
+          <div class="ep-section-hd" onclick="toggleSection('epProps')" aria-expanded="true">
+            Properties <span class="ep-arrow">▾</span>
+          </div>
+          <div class="ep-section-body" id="epPropsBody"></div>
+        </div>
+        <div class="ep-section" id="epVariants">
+          <div class="ep-section-hd" onclick="toggleSection('epVariants')" aria-expanded="true">
+            Variants <span class="ep-arrow">▾</span>
+          </div>
+          <div class="ep-section-body" id="epVariantsBody"></div>
+        </div>
+        <div class="ep-section" style="border-bottom:none">
+          <div class="ep-section-hd" onclick="toggleSection('epInfo')" aria-expanded="true">
+            Info <span class="ep-arrow">▾</span>
+          </div>
+          <div class="ep-section-body" id="epInfoBody"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// COMPONENT REGISTRY
+// Each entry: id, name, cat, tags, isNew?, variants[],
+//   defaultProps, propSchema[], render(props)→html,
+//   code: { html, css, tailwind, react }
+// ═══════════════════════════════════════════════════════
+
+const CATS = [
+  { id:'all',      label:'All Components',    icon:'⊞' },
+  { id:'navbar',   label:'Navbar',            icon:'≡' },
+  { id:'hero',     label:'Hero Sections',     icon:'★' },
+  { id:'cards',    label:'Cards',             icon:'🃏' },
+  { id:'forms',    label:'Forms',             icon:'⌨' },
+  { id:'modals',   label:'Modals & Overlays', icon:'🪟' },
+  { id:'sidebars', label:'Sidebars',          icon:'◧' },
+  { id:'dashboards',label:'Dashboards',       icon:'📊' },
+  { id:'pricing',  label:'Pricing Tables',    icon:'💰' },
+  { id:'loaders',  label:'Loaders',           icon:'⟳' },
+  { id:'alerts',   label:'Toasts & Alerts',   icon:'🔔' },
+  { id:'tabs',     label:'Tabs & Accordions', icon:'⊟' },
+  { id:'timelines',label:'Timelines',         icon:'◎' },
+  { id:'layouts',  label:'Page Layouts',      icon:'⊡', isNew:true },
+];
+
+const COMPS = [
+
+// ─── NAVBAR ────────────────────────────────────────────
+{ id:'nb1', name:'Dark Nav', cat:'navbar', tags:['nav','header','dark'], isNew:false,
+  variants:['Default','Sticky','Transparent','Minimal'],
+  defaultProps:{ bg:'#111110', text:'#f0ede8', accent:'#5558f0', logo:'UIForge', links:'Docs,Components,Blog', sticky:false, showCta:true },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'text', label:'Text color', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'logo', label:'Logo text', type:'text' },
+    { key:'links', label:'Nav links (comma)', type:'text' },
+    { key:'sticky', label:'Sticky', type:'toggle' },
+    { key:'showCta', label:'Show CTA button', type:'toggle' },
+  ],
+  render(p){
+    const links = p.links.split(',').map(l=>`<a href="#" style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${p.text};opacity:.7;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">${l.trim()}</a>`).join('');
+    return `<nav style="width:100%;max-width:860px;background:${p.bg};border-bottom:1px solid rgba(255,255,255,.08);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;gap:32px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.06em;color:${p.text}">${p.logo.toUpperCase().replace(/(\w+)/, `$1`)}</div>
+      <div style="display:flex;align-items:center;gap:24px">${links}</div>
+      ${p.showCta ? `<button style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:8px 18px;background:${p.accent};color:#fff;border:none;cursor:pointer">Get Started</button>` : ''}
+    </nav>`;
+  },
+  code:{ html:`<nav class="navbar">
+  <div class="logo">UIForge</div>
+  <div class="nav-links">
+    <a href="#">Docs</a>
+    <a href="#">Components</a>
+    <a href="#">Blog</a>
+  </div>
+  <button class="btn-primary">Get Started</button>
+</nav>`,
+    css:`.navbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:#111110;border-bottom:1px solid rgba(255,255,255,.08);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.06em;color:#f0ede8;}
+.nav-links{display:flex;gap:24px;}
+.nav-links a{font-family:monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#f0ede8;opacity:.7;transition:opacity .15s;}
+.nav-links a:hover{opacity:1;}
+.btn-primary{padding:8px 18px;background:#5558f0;color:#fff;border:none;cursor:pointer;font-family:monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;}`,
+    tailwind:`<nav class="flex items-center justify-between px-6 h-14 bg-neutral-900 border-b border-white/10">
+  <span class="font-display text-2xl tracking-wider text-white">UIForge</span>
+  <div class="flex gap-6">
+    <a href="#" class="font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white transition-opacity">Docs</a>
+    <a href="#" class="font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white transition-opacity">Components</a>
+  </div>
+  <button class="px-[18px] py-2 bg-indigo-500 text-white font-mono text-[9px] uppercase tracking-widest hover:bg-indigo-600 transition-colors">Get Started</button>
+</nav>`,
+    react:`export function Navbar({ logo = "UIForge", links = [], cta = "Get Started" }) {
+  return (
+    <nav className="flex items-center justify-between px-6 h-14 bg-neutral-900 border-b border-white/10">
+      <span className="font-display text-2xl tracking-wider text-white">{logo}</span>
+      <div className="flex gap-6">
+        {links.map(link => (
+          <a key={link.href} href={link.href}
+            className="font-mono text-[10px] uppercase tracking-widest text-white/70 hover:text-white transition-opacity">
+            {link.label}
+          </a>
+        ))}
+      </div>
+      <button className="px-[18px] py-2 bg-indigo-500 text-white font-mono text-[9px] uppercase tracking-widest hover:bg-indigo-600">
+        {cta}
+      </button>
+    </nav>
+  );
+}` }},
+
+{ id:'nb2', name:'Light Nav with Dropdown', cat:'navbar', tags:['nav','light','dropdown'],
+  variants:['Default','With Mega Menu'],
+  defaultProps:{ bg:'#ffffff', text:'#0f0e0d', accent:'#5558f0', logo:'Brand', showSearch:true },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'text', label:'Text', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'logo', label:'Logo', type:'text' },
+    { key:'showSearch', label:'Show search', type:'toggle' },
+  ],
+  render(p){
+    return `<nav style="width:100%;max-width:860px;background:${p.bg};box-shadow:0 1px 0 rgba(0,0,0,.08);padding:0 24px;display:flex;align-items:center;gap:24px;height:60px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:${p.accent}">${p.logo}</div>
+      <div style="display:flex;align-items:center;gap:4px;flex:1">
+        ${['Product','Pricing','Docs','Blog'].map(l=>`<a href="#" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:${p.text};padding:8px 12px;opacity:.75" onmouseover="this.style.opacity=1;this.style.color='${p.accent}'" onmouseout="this.style.opacity=.75;this.style.color='${p.text}'">${l}</a>`).join('')}
+      </div>
+      ${p.showSearch ? `<div style="display:flex;align-items:center;background:rgba(0,0,0,.05);padding:6px 12px;gap:8px"><span style="font-size:13px;color:rgba(0,0,0,.4)">⌕</span><span style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(0,0,0,.35)">Search…</span></div>` : ''}
+      <button style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:8px 16px;background:${p.accent};color:#fff;border:none;cursor:pointer">Sign up</button>
+    </nav>`;
+  },
+  code:{ html:`<nav class="navbar-light">...</nav>`, css:`.navbar-light{background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.08);}`, tailwind:`flex items-center px-6 h-15 bg-white shadow-sm gap-6`, react:`export function LightNav() { return <nav className="flex items-center px-6 h-[60px] bg-white shadow-sm">...</nav>; }` }},
+
+{ id:'nb3', name:'Centered Logo Nav', cat:'navbar', tags:['nav','centered','minimal'],
+  variants:['Default','Bordered'],
+  defaultProps:{ bg:'#0f0e0d', accent:'#5558f0', logo:'STUDIO', links:'Work,About,Process,Contact' },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'logo', label:'Logo', type:'text' },
+    { key:'links', label:'Links', type:'text' },
+  ],
+  render(p){
+    const ls=p.links.split(',');const half=Math.floor(ls.length/2);
+    const left=ls.slice(0,half).map(l=>`<a href="#" style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,237,232,.5)" onmouseover="this.style.color='#f0ede8'" onmouseout="this.style.color='rgba(240,237,232,.5)'">${l.trim()}</a>`).join('');
+    const right=ls.slice(half).map(l=>`<a href="#" style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,237,232,.5)" onmouseover="this.style.color='#f0ede8'" onmouseout="this.style.color='rgba(240,237,232,.5)'">${l.trim()}</a>`).join('');
+    return `<nav style="width:100%;max-width:860px;background:${p.bg};padding:0 32px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:60px;border-bottom:1px solid rgba(240,237,232,.08)">
+      <div style="display:flex;gap:28px">${left}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:#f0ede8">${p.logo}</div>
+      <div style="display:flex;gap:28px;justify-content:flex-end">${right}</div>
+    </nav>`;
+  },
+  code:{ html:`<nav class="nav-centered"><div class="nav-left">{left links}</div><div class="logo">STUDIO</div><div class="nav-right">{right links}</div></nav>`, css:`.nav-centered{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 32px;height:60px;}`, tailwind:`grid grid-cols-[1fr_auto_1fr] items-center px-8 h-[60px] bg-neutral-950 border-b border-white/10`, react:`export function CenteredNav({logo,leftLinks,rightLinks}){return <nav className="grid grid-cols-[1fr_auto_1fr] items-center px-8 h-[60px]"><div className="flex gap-7">{leftLinks.map(l=><NavLink key={l.href} {...l}/>)}</div><Logo>{logo}</Logo><div className="flex gap-7 justify-end">{rightLinks.map(l=><NavLink key={l.href} {...l}/>)}</div></nav>}` }},
+
+// ─── HERO SECTIONS ─────────────────────────────────────
+{ id:'hr1', name:'Bold Editorial Hero', cat:'hero', tags:['hero','editorial','heading'], isNew:true,
+  variants:['Dark','Light','Gradient BG'],
+  defaultProps:{ bg:'#080807', accent:'#5558f0', headingColor:'#f0ede8', kicker:'Vol. I · New Release', heading:'Build Faster.', sub:'Everything you need to ship production UI in hours, not weeks.', ctaLabel:'Start Free', ctaSecLabel:'See components' },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'headingColor', label:'Heading color', type:'color' },
+    { key:'kicker', label:'Kicker text', type:'text' },
+    { key:'heading', label:'Headline', type:'text' },
+    { key:'sub', label:'Subtitle', type:'text' },
+    { key:'ctaLabel', label:'CTA label', type:'text' },
+  ],
+  render(p){
+    return `<section style="width:100%;max-width:860px;background:${p.bg};padding:64px 48px;position:relative;overflow:hidden;background-image:repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(240,237,232,.03) 47px,rgba(240,237,232,.03) 48px),repeating-linear-gradient(90deg,transparent,transparent 47px,rgba(240,237,232,.03) 47px,rgba(240,237,232,.03) 48px)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${p.accent}"></div>
+      <p style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:${p.accent};margin-bottom:20px">${p.kicker}</p>
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,10vw,120px);line-height:.9;letter-spacing:.02em;color:${p.headingColor};margin-bottom:24px">${p.heading}</h1>
+      <p style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:18px;color:rgba(240,237,232,.6);max-width:480px;line-height:1.6;margin-bottom:36px">${p.sub}</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:12px 28px;background:${p.accent};color:#fff;border:none;cursor:pointer;transition:all .18s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(85,88,240,.4)'" onmouseout="this.style.transform='';this.style.boxShadow=''">${p.ctaLabel} →</button>
+        <button style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:12px 28px;background:transparent;color:rgba(240,237,232,.6);border:1px solid rgba(240,237,232,.2);cursor:pointer">${p.ctaSecLabel}</button>
+      </div>
+    </section>`;
+  },
+  code:{ html:`<section class="hero">
+  <p class="hero-kicker">Vol. I · New Release</p>
+  <h1 class="hero-heading">Build Faster.</h1>
+  <p class="hero-sub">Everything you need to ship production UI.</p>
+  <div class="hero-actions">
+    <button class="btn-primary">Start Free →</button>
+    <button class="btn-ghost">See components</button>
+  </div>
+</section>`,
+    css:`.hero{padding:64px 48px;background:#080807;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#5558f0;}
+.hero-kicker{font-family:monospace;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:#5558f0;margin-bottom:20px;}
+.hero-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,10vw,120px);line-height:.9;letter-spacing:.02em;color:#f0ede8;margin-bottom:24px;}
+.hero-sub{font-size:18px;font-style:italic;color:rgba(240,237,232,.6);max-width:480px;line-height:1.6;margin-bottom:36px;}`,
+    tailwind:`<section className="relative overflow-hidden px-12 py-16 bg-[#080807] [background-image:repeating-linear-gradient(0deg,transparent,transparent_47px,rgba(240,237,232,0.03)_47px,rgba(240,237,232,0.03)_48px)]">
+  <div className="absolute top-0 inset-x-0 h-0.5 bg-indigo-500" />
+  <p className="font-mono text-[9px] uppercase tracking-[.24em] text-indigo-400 mb-5">Vol. I · New Release</p>
+  <h1 className="font-display text-[clamp(64px,10vw,120px)] leading-none tracking-tight text-white mb-6">Build Faster.</h1>
+  <p className="italic text-lg text-white/60 max-w-xl leading-relaxed mb-9">Everything you need to ship production UI.</p>
+  <div className="flex gap-3 flex-wrap">
+    <button className="font-mono text-[10px] uppercase tracking-widest px-7 py-3 bg-indigo-500 text-white hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(85,88,240,0.4)] transition-all">Start Free →</button>
+    <button className="font-mono text-[10px] uppercase tracking-widest px-7 py-3 text-white/60 border border-white/20">See components</button>
+  </div>
+</section>`,
+    react:`export function Hero({ kicker, heading, subtitle, cta, ctaSecondary }) {
+  return (
+    <section className="relative overflow-hidden px-12 py-16 bg-[#080807]">
+      <div className="absolute top-0 inset-x-0 h-0.5 bg-indigo-500" aria-hidden="true" />
+      <p className="font-mono text-[9px] uppercase tracking-[.24em] text-indigo-400 mb-5">{kicker}</p>
+      <h1 className="font-display text-[clamp(64px,10vw,120px)] leading-none text-white mb-6">{heading}</h1>
+      <p className="italic text-lg text-white/60 max-w-xl leading-relaxed mb-9">{subtitle}</p>
+      <div className="flex gap-3 flex-wrap">
+        <button className="... bg-indigo-500 text-white hover:-translate-y-0.5 transition-all">{cta}</button>
+        <button className="... text-white/60 border border-white/20">{ctaSecondary}</button>
+      </div>
+    </section>
+  );
+}` }},
+
+{ id:'hr2', name:'Split Hero', cat:'hero', tags:['hero','split','image'],
+  variants:['Dark','Light'],
+  defaultProps:{ bg:'#0f0e0d', accent:'#5558f0', heading:'Design Systems,That Scale.', sub:'A complete component library for modern web apps.', ctaLabel:'Explore', imgColor:'#5558f0' },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'heading', label:'Headline (comma=break)', type:'text' },
+    { key:'sub', label:'Sub', type:'text' },
+    { key:'ctaLabel', label:'CTA', type:'text' },
+    { key:'imgColor', label:'Visual color', type:'color' },
+  ],
+  render(p){
+    const lines=p.heading.split(',');
+    return `<section style="width:100%;max-width:860px;background:${p.bg};display:grid;grid-template-columns:1fr 1fr;min-height:280px">
+      <div style="padding:48px 40px;display:flex;flex-direction:column;justify-content:center;gap:20px;border-right:1px solid rgba(240,237,232,.08)">
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,6vw,72px);line-height:.92;letter-spacing:.03em;color:#f0ede8">${lines.map((l,i)=>i===0?`<span style="color:${p.accent}">${l}</span>`:l).join('<br>')}</h1>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:15px;color:rgba(240,237,232,.55);line-height:1.65;max-width:300px">${p.sub}</p>
+        <button style="align-self:flex-start;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:10px 22px;background:${p.accent};color:#fff;border:none;cursor:pointer">${p.ctaLabel} →</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;padding:32px;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,${p.imgColor}22 0%,transparent 70%)"></div>
+        <div style="width:180px;height:180px;border:1.5px solid ${p.imgColor}44;display:flex;align-items:center;justify-content:center;position:relative">
+          <div style="position:absolute;inset:8px;border:1px solid ${p.imgColor}33"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:${p.imgColor};letter-spacing:.06em;line-height:1">UI</div>
+        </div>
+      </div>
+    </section>`;
+  },
+  code:{ html:`<section class="hero-split"><div class="hero-content">...</div><div class="hero-visual">...</div></section>`, css:`.hero-split{display:grid;grid-template-columns:1fr 1fr;min-height:280px;}`, tailwind:`grid grid-cols-2 bg-neutral-950`, react:`export function SplitHero({heading,sub,cta,visual}){return <section className="grid grid-cols-2 bg-neutral-950">...</section>}` }},
+
+{ id:'hr3', name:'Gradient Mesh Hero', cat:'hero', tags:['hero','gradient','glow'], isNew:true,
+  variants:['Default','Minimal'],
+  defaultProps:{ color1:'#5558f0', color2:'#a78bfa', color3:'#ec4899', heading:'Components.\nBeautifully crafted.', sub:'Copy, paste, customise. Ship in minutes.', ctaLabel:'Browse Library' },
+  propSchema:[
+    { key:'color1', label:'Color 1', type:'color' },
+    { key:'color2', label:'Color 2', type:'color' },
+    { key:'color3', label:'Color 3', type:'color' },
+    { key:'heading', label:'Heading', type:'text' },
+    { key:'sub', label:'Subtitle', type:'text' },
+    { key:'ctaLabel', label:'CTA', type:'text' },
+  ],
+  render(p){
+    return `<section style="width:100%;max-width:860px;background:#080807;padding:72px 48px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40%;left:-10%;width:55%;height:100%;background:radial-gradient(ellipse,${p.color1}30 0%,transparent 65%);pointer-events:none"></div>
+      <div style="position:absolute;top:-20%;right:-10%;width:45%;height:80%;background:radial-gradient(ellipse,${p.color3}25 0%,transparent 60%);pointer-events:none"></div>
+      <div style="position:absolute;bottom:-20%;left:30%;width:40%;height:60%;background:radial-gradient(ellipse,${p.color2}20 0%,transparent 60%);pointer-events:none"></div>
+      <div style="position:relative">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:4px 14px 4px 6px;border:1px solid rgba(85,88,240,.3);background:rgba(85,88,240,.08);margin-bottom:28px">
+          <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:2px 8px;background:${p.color1};color:#fff">New</span>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(240,237,232,.6)">v2 — Component Library is live</span>
+        </div>
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,9vw,110px);line-height:.88;letter-spacing:.02em;color:#f0ede8;margin-bottom:24px">${p.heading.replace(/\n/,'<br>')}</h1>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:17px;color:rgba(240,237,232,.55);max-width:400px;margin:0 auto 36px;line-height:1.65">${p.sub}</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:12px 32px;background:${p.color1};color:#fff;border:none;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 32px rgba(85,88,240,.4)'" onmouseout="this.style.transform='';this.style.boxShadow=''">${p.ctaLabel}</button>
+          <button style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:12px 32px;background:transparent;color:rgba(240,237,232,.6);border:1px solid rgba(240,237,232,.18);cursor:pointer">View on GitHub</button>
+        </div>
+      </div>
+    </section>`;
+  },
+  code:{ html:`<section class="hero-mesh">...</section>`, css:`.hero-mesh{position:relative;overflow:hidden;text-align:center;padding:72px 48px;}`, tailwind:`relative overflow-hidden text-center px-12 py-[72px] bg-[#080807]`, react:`export function GradientHero({color1,color2,color3,heading,sub,cta}){...}` }},
+
+// ─── CARDS ─────────────────────────────────────────────
+{ id:'ca1', name:'Product Card', cat:'cards', tags:['card','product','ecommerce'],
+  variants:['Default','With Badge','Minimal'],
+  defaultProps:{ bg:'#161514', border:'rgba(240,237,232,.12)', accent:'#5558f0', imgColor:'#5558f0', title:'Pro Template', price:'$49', badge:'Popular', showBadge:true, btnLabel:'Buy Now' },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'imgColor', label:'Image color', type:'color' },
+    { key:'title', label:'Title', type:'text' },
+    { key:'price', label:'Price', type:'text' },
+    { key:'badge', label:'Badge text', type:'text' },
+    { key:'showBadge', label:'Show badge', type:'toggle' },
+    { key:'btnLabel', label:'Button', type:'text' },
+  ],
+  render(p){
+    return `<div style="width:240px;background:${p.bg};border:1.5px solid ${p.border};position:relative;overflow:hidden">
+      ${p.showBadge?`<div style="position:absolute;top:12px;right:12px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;background:${p.accent};color:#fff;z-index:1">${p.badge}</div>`:''}
+      <div style="height:140px;background:${p.imgColor}22;border-bottom:1px solid ${p.border};display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,${p.imgColor}33,transparent 70%)"></div>
+        <div style="width:72px;height:72px;background:${p.imgColor}44;border:2px solid ${p.imgColor}66;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;color:${p.imgColor}">UI</div>
+      </div>
+      <div style="padding:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:#f0ede8;margin-bottom:4px">${p.title}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,237,232,.45);margin-bottom:14px">UI Template · CSS + Tailwind</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#f0ede8;letter-spacing:.04em">${p.price}</div>
+          <button style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;padding:7px 16px;background:${p.accent};color:#fff;border:none;cursor:pointer;transition:all .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">${p.btnLabel}</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  code:{ html:`<div class="product-card">
+  <div class="badge">Popular</div>
+  <div class="card-img">...</div>
+  <div class="card-body">
+    <h3>Pro Template</h3>
+    <p class="meta">UI Template · CSS + Tailwind</p>
+    <div class="card-footer">
+      <span class="price">$49</span>
+      <button class="btn">Buy Now</button>
+    </div>
+  </div>
+</div>`, css:`.product-card{width:240px;border:1.5px solid rgba(255,255,255,.12);position:relative;}
+.badge{position:absolute;top:12px;right:12px;background:#5558f0;color:#fff;font-family:monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;}
+.price{font-family:'Bebas Neue';font-size:32px;letter-spacing:.04em;}`, tailwind:`relative w-60 border border-white/10 overflow-hidden bg-neutral-900`, react:`export function ProductCard({title,price,badge,showBadge,accent,onBuy}){return(<div className="relative w-60 border border-white/10 bg-neutral-900">{showBadge&&<span className="absolute top-3 right-3 text-[8px] font-mono uppercase tracking-widest px-2.5 py-1 bg-indigo-500 text-white">{badge}</span>}<div className="h-36 bg-indigo-500/10 flex items-center justify-center">...</div><div className="p-4"><h3 className="font-bold text-lg">{title}</h3><div className="flex items-center justify-between mt-4"><span className="font-display text-3xl">{price}</span><button onClick={onBuy} className="px-4 py-2 text-[8.5px] font-mono uppercase tracking-widest bg-indigo-500 text-white">Buy</button></div></div></div>)}` }},
+
+{ id:'ca2', name:'Blog Post Card', cat:'cards', tags:['card','blog','article'],
+  variants:['Default','Horizontal'],
+  defaultProps:{ bg:'#161514', accent:'#5558f0', category:'Design Systems', title:'Building a scalable component library from scratch', author:'Alex Kim', date:'Mar 20, 2025', readTime:'5 min read' },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'category', label:'Category', type:'text' },
+    { key:'title', label:'Title', type:'text' },
+    { key:'author', label:'Author', type:'text' },
+    { key:'date', label:'Date', type:'text' },
+    { key:'readTime', label:'Read time', type:'text' },
+  ],
+  render(p){
+    return `<div style="width:280px;background:${p.bg};border:1.5px solid rgba(240,237,232,.1);overflow:hidden;transition:border-color .18s" onmouseover="this.style.borderColor='${p.accent}44'" onmouseout="this.style.borderColor='rgba(240,237,232,.1)'">
+      <div style="height:120px;background:linear-gradient(135deg,${p.accent}33,${p.accent}11);border-bottom:1px solid rgba(240,237,232,.08);display:flex;align-items:center;justify-content:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:${p.accent}66;letter-spacing:.08em">✦</div>
+      </div>
+      <div style="padding:18px 16px">
+        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:${p.accent};margin-bottom:10px">${p.category}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:#f0ede8;line-height:1.35;margin-bottom:16px">${p.title}</div>
+        <div style="display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid rgba(240,237,232,.08)">
+          <div style="width:28px;height:28px;background:${p.accent};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff">${p.author.charAt(0)}</div>
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:#f0ede8">${p.author}</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(240,237,232,.4)">${p.date} · ${p.readTime}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+  code:{ html:`<div class="blog-card">
+  <div class="card-cover"></div>
+  <div class="card-body">
+    <span class="category">Design Systems</span>
+    <h2>Building a scalable component library</h2>
+    <div class="author-row">
+      <img src="avatar.jpg" alt="Alex Kim" class="avatar">
+      <div><span>Alex Kim</span><span>Mar 20 · 5 min</span></div>
+    </div>
+  </div>
+</div>`, css:`.blog-card{width:280px;border:1.5px solid rgba(255,255,255,.1);overflow:hidden;}
+.category{font-family:monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#5558f0;}`, tailwind:`w-70 border border-white/10 overflow-hidden hover:border-indigo-500/30 transition-colors`, react:`export function BlogCard({category,title,author,date,readTime}){...}` }},
+
+{ id:'ca3', name:'Stats Dashboard Card', cat:'cards', tags:['card','stats','dashboard'],
+  variants:['Default','Compact'],
+  defaultProps:{ bg:'#161514', accent:'#5558f0', label:'Monthly Revenue', value:'$48,294', delta:'+12.4%', deltaPositive:true, sparkColor:'#5558f0' },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'label', label:'Metric label', type:'text' },
+    { key:'value', label:'Value', type:'text' },
+    { key:'delta', label:'Change', type:'text' },
+    { key:'deltaPositive', label:'Positive change', type:'toggle' },
+    { key:'sparkColor', label:'Spark color', type:'color' },
+  ],
+  render(p){
+    const dc=p.deltaPositive?'#22c55e':'#ef4444';
+    const spark=[40,55,35,70,45,80,65,90,75,95].map((v,i)=>`<rect x="${i*10}" y="${100-v}" width="8" height="${v}" fill="${p.sparkColor}" opacity="${.3+i*.07}"/>`).join('');
+    return `<div style="width:260px;background:${p.bg};border:1.5px solid rgba(240,237,232,.1);padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(240,237,232,.45)">${p.label}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:8.5px;padding:3px 9px;background:${p.deltaPositive?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)'};color:${dc};border:1px solid ${dc}33">${p.delta}</div>
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;color:#f0ede8;letter-spacing:.04em;margin-bottom:16px">${p.value}</div>
+      <svg viewBox="0 0 100 100" style="width:100%;height:48px" aria-label="Revenue trend sparkline">${spark}</svg>
+    </div>`;
+  },
+  code:{ html:`<div class="stat-card">
+  <div class="stat-header">
+    <span class="stat-label">Monthly Revenue</span>
+    <span class="stat-badge stat-up">+12.4%</span>
+  </div>
+  <div class="stat-value">$48,294</div>
+  <svg class="sparkline" aria-label="Trend chart">...</svg>
+</div>`, css:`.stat-card{padding:20px;border:1.5px solid rgba(255,255,255,.1);}
+.stat-value{font-family:'Bebas Neue';font-size:44px;line-height:1;letter-spacing:.04em;}
+.stat-up{color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.2);}`, tailwind:`p-5 border border-white/10 w-64`, react:`export function StatCard({label,value,delta,positive,sparkData}){const color=positive?'text-green-400':'text-red-400';return(<div className="p-5 border border-white/10"><div className="flex items-center justify-between mb-4"><span className="font-mono text-[9px] uppercase tracking-widest text-white/45">{label}</span><span className={\`font-mono text-[8.5px] px-2 py-0.5 \${positive?'text-green-400 bg-green-500/10 border-green-500/20':'text-red-400 bg-red-500/10 border-red-500/20'} border\`}>{delta}</span></div><p className="font-display text-5xl leading-none mb-4">{value}</p><Sparkline data={sparkData} color={color}/></div>)}` }},
+
+// ─── FORMS ─────────────────────────────────────────────
+{ id:'fm1', name:'Login Form', cat:'forms', tags:['form','login','auth'],
+  variants:['Default','With Social','Minimal'],
+  defaultProps:{ bg:'#161514', accent:'#5558f0', heading:'Welcome back', btnLabel:'Sign in', showSocial:true, showForgot:true },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'heading', label:'Heading', type:'text' },
+    { key:'btnLabel', label:'Button label', type:'text' },
+    { key:'showSocial', label:'Social login', type:'toggle' },
+    { key:'showForgot', label:'Forgot link', type:'toggle' },
+  ],
+  render(p){
+    return `<div style="width:320px;background:${p.bg};border:1.5px solid rgba(240,237,232,.1);padding:32px">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.04em;color:#f0ede8;margin-bottom:6px">${p.heading}</h2>
+      <p style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:13px;color:rgba(240,237,232,.45);margin-bottom:28px">Enter your credentials to continue</p>
+      ${p.showSocial?`<div style="display:flex;gap:8px;margin-bottom:20px">
+        ${['Google','GitHub'].map(s=>`<button style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,232,.6);border:1px solid rgba(240,237,232,.14);background:transparent;cursor:pointer" onmouseover="this.style.borderColor='${p.accent}66'" onmouseout="this.style.borderColor='rgba(240,237,232,.14)'">${s}</button>`).join('')}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><div style="flex:1;height:1px;background:rgba(240,237,232,.08)"></div><span style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(240,237,232,.3)">or</span><div style="flex:1;height:1px;background:rgba(240,237,232,.08)"></div></div>`:''}
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(240,237,232,.45)">Email</label>
+          <input type="email" placeholder="you@example.com" aria-label="Email address" style="background:rgba(0,0,0,.3);border:1.5px solid rgba(240,237,232,.12);color:#f0ede8;padding:10px 14px;font-family:'Space Mono',monospace;font-size:11px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='${p.accent}'" onblur="this.style.borderColor='rgba(240,237,232,.12)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <label style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(240,237,232,.45)">Password</label>
+            ${p.showForgot?`<a href="#" style="font-family:'Space Mono',monospace;font-size:8px;color:${p.accent}">Forgot?</a>`:''}
+          </div>
+          <input type="password" placeholder="••••••••" aria-label="Password" style="background:rgba(0,0,0,.3);border:1.5px solid rgba(240,237,232,.12);color:#f0ede8;padding:10px 14px;font-family:'Space Mono',monospace;font-size:11px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='${p.accent}'" onblur="this.style.borderColor='rgba(240,237,232,.12)'">
+        </div>
+      </div>
+      <button style="width:100%;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;padding:12px;background:${p.accent};color:#fff;border:none;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.opacity=.88" onmouseout="this.style.opacity=1">${p.btnLabel} →</button>
+      <p style="font-family:'Space Mono',monospace;font-size:8.5px;color:rgba(240,237,232,.35);text-align:center;margin-top:18px">Don't have an account? <a href="#" style="color:${p.accent}">Sign up</a></p>
+    </div>`;
+  },
+  code:{ html:`<div class="login-form">
+  <h2>Welcome back</h2>
+  <p>Enter your credentials to continue</p>
+  <form>
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="you@example.com" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="••••••••" required>
+    <button type="submit">Sign in →</button>
+  </form>
+</div>`, css:`.login-form{width:320px;padding:32px;border:1.5px solid rgba(255,255,255,.1);}
+input{background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.12);color:#f0ede8;padding:10px 14px;font-family:monospace;font-size:11px;width:100%;outline:none;}
+input:focus{border-color:#5558f0;}`, tailwind:`w-80 p-8 border border-white/10 bg-neutral-900`, react:`export function LoginForm({onSubmit,showSocial,accent}){const [email,setEmail]=useState('');const [password,setPassword]=useState('');return(<form onSubmit={e=>{e.preventDefault();onSubmit({email,password});}} className="w-80 p-8 border border-white/10 bg-neutral-900"><h2 className="font-display text-4xl mb-1">Welcome back</h2><p className="italic text-sm text-white/45 mb-7">Enter your credentials</p>{showSocial&&<SocialButtons/>}<label className="block font-mono text-[8.5px] uppercase tracking-widest text-white/45 mb-1.5">Email</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} className="w-full bg-black/30 border border-white/12 text-white px-3.5 py-2.5 font-mono text-xs outline-none focus:border-indigo-500 mb-3.5" required/><label className="block font-mono text-[8.5px] uppercase tracking-widest text-white/45 mb-1.5">Password</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} className="w-full bg-black/30 border border-white/12 text-white px-3.5 py-2.5 font-mono text-xs outline-none focus:border-indigo-500 mb-5" required/><button type="submit" className="w-full py-3 bg-indigo-500 text-white font-mono text-[9.5px] uppercase tracking-widest hover:opacity-90 transition-opacity">Sign in →</button></form>)}` }},
+
+// ─── MODALS ─────────────────────────────────────────────
+{ id:'mo1', name:'Confirm Dialog', cat:'modals', tags:['modal','dialog','confirm'],
+  variants:['Default','Danger'],
+  defaultProps:{ bg:'#161514', accent:'#5558f0', dangerMode:false, icon:'🗑️', heading:'Delete project?', body:'This will permanently remove the project and all its data. This action cannot be undone.', cancelLabel:'Cancel', confirmLabel:'Delete' },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent color', type:'color' },
+    { key:'dangerMode', label:'Danger mode', type:'toggle' },
+    { key:'icon', label:'Icon', type:'text' },
+    { key:'heading', label:'Heading', type:'text' },
+    { key:'body', label:'Body text', type:'text' },
+    { key:'confirmLabel', label:'Confirm label', type:'text' },
+  ],
+  render(p){
+    const btnBg=p.dangerMode?'#ef4444':p.accent;
+    return `<div style="position:relative;width:320px">
+      <div style="position:absolute;inset:-20px;background:rgba(0,0,0,.5);border-radius:0" aria-hidden="true"></div>
+      <div style="position:relative;background:${p.bg};border:1.5px solid rgba(240,237,232,.12);padding:28px 24px;text-align:center">
+        <div style="font-size:36px;margin-bottom:14px">${p.icon}</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;color:#f0ede8;margin-bottom:10px">${p.heading}</h3>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:13.5px;color:rgba(240,237,232,.5);line-height:1.65;margin-bottom:24px">${p.body}</p>
+        <div style="display:flex;gap:10px">
+          <button style="flex:1;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:10px;background:transparent;color:rgba(240,237,232,.5);border:1px solid rgba(240,237,232,.16);cursor:pointer">${p.cancelLabel}</button>
+          <button style="flex:1;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:10px;background:${btnBg};color:#fff;border:none;cursor:pointer">${p.confirmLabel}</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  code:{ html:`<div class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><p class="modal-icon">🗑️</p><h3 id="modal-title">Delete project?</h3><p>This action cannot be undone.</p><div class="modal-actions"><button class="btn-ghost">Cancel</button><button class="btn-danger">Delete</button></div></div></div>`, css:`.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;}
+.modal{background:#161514;border:1.5px solid rgba(255,255,255,.12);padding:28px 24px;text-align:center;max-width:320px;}`, tailwind:`fixed inset-0 bg-black/75 flex items-center justify-center z-50 [&_.modal]:relative [&_.modal]:bg-neutral-900 [&_.modal]:border [&_.modal]:border-white/10 [&_.modal]:p-7 [&_.modal]:text-center`, react:`export function ConfirmDialog({open,onCancel,onConfirm,icon,heading,body,dangerous}){if(!open)return null;return createPortal(<div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50" onClick={onCancel}><div className="bg-neutral-900 border border-white/10 p-7 text-center max-w-xs w-full" onClick={e=>e.stopPropagation()}><span className="text-4xl block mb-3">{icon}</span><h3 className="font-display text-3xl mb-2">{heading}</h3><p className="italic text-sm text-white/50 mb-6 leading-relaxed">{body}</p><div className="flex gap-2.5"><button onClick={onCancel} className="flex-1 py-2.5 text-white/50 border border-white/15 font-mono text-[9px] uppercase tracking-widest">Cancel</button><button onClick={onConfirm} className={\`flex-1 py-2.5 font-mono text-[9px] uppercase tracking-widest text-white \${dangerous?'bg-red-500':'bg-indigo-500'}\`}>{dangerous?'Delete':'Confirm'}</button></div></div></div>,document.body)}` }},
+
+// ─── PRICING ─────────────────────────────────────────────
+{ id:'pr1', name:'Pricing Table', cat:'pricing', tags:['pricing','plans','saas'], isNew:true,
+  variants:['Dark','Light','Annual/Monthly toggle'],
+  defaultProps:{ accent:'#5558f0', highlightPlan:'Pro', currency:'$', showToggle:true },
+  propSchema:[
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'highlightPlan', label:'Highlighted plan', type:'chips', options:['Starter','Pro','Enterprise'] },
+    { key:'currency', label:'Currency', type:'chips', options:['$','€','£','¥'] },
+    { key:'showToggle', label:'Annual toggle', type:'toggle' },
+  ],
+  render(p){
+    const plans=[{name:'Starter',price:'9',features:['5 projects','10GB storage','Basic analytics','Email support']},{name:'Pro',price:'29',features:['Unlimited projects','100GB storage','Advanced analytics','Priority support','Custom domain','Team collaboration']},{name:'Enterprise',price:'99',features:['Everything in Pro','SSO / SAML','SLA guarantee','Dedicated support','Custom contracts','On-premise option']}];
+    return `<div style="max-width:780px;width:100%">
+      ${p.showToggle?`<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px">
+        <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,232,.6)">Monthly</span>
+        <div style="width:48px;height:26px;background:${p.accent};border:1px solid ${p.accent};position:relative;cursor:pointer"><div style="position:absolute;left:24px;top:3px;width:18px;height:18px;background:#fff;transition:left .2s"></div></div>
+        <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#f0ede8">Annual <span style="color:#22c55e;font-size:8px">−20%</span></span>
+      </div>`:''}
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(240,237,232,.1)">
+        ${plans.map(plan=>{const hl=plan.name===p.highlightPlan;return`<div style="background:${hl?p.accent+'22':'#161514'};padding:28px 20px;border:${hl?`2px solid ${p.accent}`:'2px solid transparent'};position:relative">
+          ${hl?`<div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:4px 14px;background:${p.accent};color:#fff;white-space:nowrap">Most popular</div>`:''}
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:${hl?p.accent:'rgba(240,237,232,.5)'};margin-bottom:10px">${plan.name}</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:#f0ede8;letter-spacing:.04em;margin-bottom:4px">${p.currency}${plan.price}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(240,237,232,.35);margin-bottom:20px">per month</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;padding-top:16px;border-top:1px solid rgba(240,237,232,.1)">
+            ${plan.features.map(f=>`<div style="display:flex;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(240,237,232,.7)"><span style="color:${hl?p.accent:'#22c55e'};font-size:11px">✓</span>${f}</div>`).join('')}
+          </div>
+          <button style="width:100%;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;padding:11px;background:${hl?p.accent:'transparent'};color:${hl?'#fff':'rgba(240,237,232,.6)'};border:1px solid ${hl?p.accent:'rgba(240,237,232,.2)'};cursor:pointer">Get ${plan.name}</button>
+        </div>`;}).join('')}
+      </div>
+    </div>`;
+  },
+  code:{ html:`<div class="pricing-grid">
+  <div class="plan">
+    <p class="plan-name">Starter</p>
+    <p class="plan-price">$9<span>/mo</span></p>
+    <ul class="features">
+      <li>✓ 5 projects</li>
+      <li>✓ 10GB storage</li>
+    </ul>
+    <button>Get Starter</button>
+  </div>
+  <div class="plan featured">...</div>
+  <div class="plan">...</div>
+</div>`, css:`.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.1);}
+.plan{padding:28px 20px;background:#161514;}
+.plan.featured{background:rgba(85,88,240,.12);border:2px solid #5558f0;position:relative;}
+.plan-price{font-family:'Bebas Neue';font-size:52px;line-height:1;}`, tailwind:`grid grid-cols-3 gap-px bg-white/10 [&_.plan]:bg-neutral-900 [&_.plan]:p-7 [&_.featured]:bg-indigo-500/10 [&_.featured]:border-2 [&_.featured]:border-indigo-500`, react:`export function PricingTable({plans,currency,highlighted}){return(<div className="grid grid-cols-3 gap-px bg-white/10">{plans.map(plan=><PlanCard key={plan.id} plan={plan} currency={currency} highlighted={plan.name===highlighted}/>)}</div>)}` }},
+
+// ─── LOADERS ──────────────────────────────────────────────
+{ id:'lo1', name:'Loader Collection', cat:'loaders', tags:['loader','spinner','skeleton'],
+  variants:['Spinners','Skeletons','Progress'],
+  defaultProps:{ accent:'#5558f0', size:40, speed:1.0, style:'spinner' },
+  propSchema:[
+    { key:'accent', label:'Color', type:'color' },
+    { key:'size', label:'Size (px)', type:'range', min:20, max:80, step:4 },
+    { key:'speed', label:'Speed (s)', type:'range', min:0.3, max:3, step:0.1 },
+    { key:'style', label:'Style', type:'chips', options:['spinner','dots','bars','ring'] },
+  ],
+  render(p){
+    const s=+p.size,sp=+p.speed;
+    const spinners={
+      spinner:`<div style="width:${s}px;height:${s}px;border:${Math.max(2,s/12)}px solid rgba(85,88,240,.2);border-top-color:${p.accent};border-radius:50%;animation:spin ${sp}s linear infinite" aria-label="Loading"></div>`,
+      dots:`<div style="display:flex;gap:${s/6}px;align-items:center">${[0,.2,.4].map(d=>`<div style="width:${s/4}px;height:${s/4}px;background:${p.accent};border-radius:50%;animation:dotPulse ${sp}s ease-in-out ${d}s infinite alternate" aria-hidden="true"></div>`).join('')}</div>`,
+      bars:`<div style="display:flex;gap:${s/8}px;align-items:flex-end;height:${s}px">${[0,.1,.2,.3,.4].map((d,i)=>`<div style="width:${s/6}px;background:${p.accent};animation:barGrow ${sp}s ease-in-out ${d}s infinite alternate;height:${30+i*14}%" aria-hidden="true"></div>`).join('')}</div>`,
+      ring:`<div style="position:relative;width:${s}px;height:${s}px" aria-label="Loading"><div style="position:absolute;inset:0;border:${Math.max(2,s/12)}px solid transparent;border-top-color:${p.accent};border-right-color:${p.accent};border-radius:50%;animation:spin ${sp}s linear infinite"></div><div style="position:absolute;inset:${s/5}px;border:${Math.max(2,s/14)}px solid transparent;border-bottom-color:${p.accent};border-radius:50%;animation:spin ${sp*.7}s linear infinite reverse"></div></div>`,
+    };
+    return `<style>
+      @keyframes spin{to{transform:rotate(360deg)}}
+      @keyframes dotPulse{from{opacity:.3;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+      @keyframes barGrow{from{opacity:.4}to{opacity:1}}
+    </style>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:24px">
+      ${spinners[p.style]||spinners.spinner}
+      <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,237,232,.4)">Loading…</div>
+    </div>`;
+  },
+  code:{ html:`<!-- Spinner -->
+<div class="spinner" role="status" aria-label="Loading">
+  <span class="sr-only">Loading...</span>
+</div>
+
+<!-- Dot loader -->
+<div class="dot-loader" aria-label="Loading">
+  <div></div><div></div><div></div>
+</div>`, css:`@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:40px;height:40px;border:3px solid rgba(85,88,240,.2);border-top-color:#5558f0;border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes dotPulse{0%,100%{opacity:.3;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+.dot-loader{display:flex;gap:6px;align-items:center;}
+.dot-loader div{width:10px;height:10px;background:#5558f0;border-radius:50%;animation:dotPulse 1s ease-in-out infinite;}
+.dot-loader div:nth-child(2){animation-delay:.2s;}
+.dot-loader div:nth-child(3){animation-delay:.4s;}`, tailwind:`animate-spin rounded-full h-10 w-10 border-[3px] border-indigo-500/20 border-t-indigo-500`, react:`export function Spinner({size=40,color='#5558f0',speed=1}){return(<div role="status" aria-label="Loading" className="rounded-full border-[3px] border-indigo-500/20 border-t-indigo-500 animate-spin" style={{width:size,height:size,animationDuration:\`\${speed}s\`}}><span className="sr-only">Loading...</span></div>)}` }},
+
+// ─── ALERTS / TOASTS ──────────────────────────────────────
+{ id:'to1', name:'Toast Notification Stack', cat:'alerts', tags:['toast','alert','notification'],
+  variants:['Success','Error','Warning','Info'],
+  defaultProps:{ type:'success', position:'bottom-right', autoDismiss:true, showIcon:true },
+  propSchema:[
+    { key:'type', label:'Type', type:'chips', options:['success','error','warning','info'] },
+    { key:'position', label:'Position', type:'chips', options:['top-right','bottom-right','top-center'] },
+    { key:'autoDismiss', label:'Auto dismiss', type:'toggle' },
+    { key:'showIcon', label:'Show icon', type:'toggle' },
+  ],
+  render(p){
+    const config={success:{bg:'rgba(34,197,94,.1)',border:'rgba(34,197,94,.3)',color:'#4ade80',icon:'✓',title:'Success',msg:'Changes saved successfully.'},error:{bg:'rgba(239,68,68,.1)',border:'rgba(239,68,68,.3)',color:'#f87171',icon:'✕',title:'Error',msg:'Something went wrong. Please try again.'},warning:{bg:'rgba(245,158,11,.1)',border:'rgba(245,158,11,.3)',color:'#fbbf24',icon:'⚠',title:'Warning',msg:'Please review before continuing.'},info:{bg:'rgba(85,88,240,.1)',border:'rgba(85,88,240,.3)',color:'#818cf8',icon:'ℹ',title:'Info',msg:'An update is available. Click to install.'}};
+    const c=config[p.type]||config.success;
+    return `<div style="display:flex;flex-direction:column;gap:8px;width:300px">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:${c.bg};border:1px solid ${c.border};border-left:3px solid ${c.color};box-shadow:0 8px 24px rgba(0,0,0,.3);animation:slideInRight .3s ease both">
+        ${p.showIcon?`<span style="font-size:15px;color:${c.color};flex-shrink:0;margin-top:1px">${c.icon}</span>`:''}
+        <div style="flex:1"><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#f0ede8;margin-bottom:3px">${c.title}</div><div style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:13px;color:rgba(240,237,232,.6)">${c.msg}</div></div>
+        <span style="font-family:'Space Mono',monospace;font-size:14px;color:rgba(240,237,232,.35);cursor:pointer;flex-shrink:0" onclick="this.parentElement.style.display='none'" aria-label="Dismiss">×</span>
+      </div>
+      <style>@keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}</style>
+    </div>`;
+  },
+  code:{ html:`<div class="toast toast-success" role="alert" aria-live="polite">
+  <span class="toast-icon" aria-hidden="true">✓</span>
+  <div class="toast-body">
+    <p class="toast-title">Success</p>
+    <p class="toast-msg">Changes saved successfully.</p>
+  </div>
+  <button class="toast-close" aria-label="Dismiss">×</button>
+</div>`, css:`.toast{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-left:3px solid;animation:slideInRight .3s ease both;}
+.toast-success{background:rgba(34,197,94,.1);border-color:#22c55e;}
+.toast-title{font-weight:700;color:#f0ede8;}
+.toast-close{background:none;border:none;cursor:pointer;color:rgba(240,237,232,.35);font-size:14px;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}`, tailwind:`flex items-start gap-3 px-4 py-3.5 border-l-[3px] bg-green-500/10 border-green-500/30 shadow-xl animate-[slideInRight_.3s_ease_both]`, react:`export function Toast({type='success',title,message,onDismiss}){const config={success:{bg:'bg-green-500/10',border:'border-green-500/30',color:'text-green-400',icon:'✓'},error:{bg:'bg-red-500/10',border:'border-red-500/30',color:'text-red-400',icon:'✕'},warning:{bg:'bg-yellow-500/10',border:'border-yellow-500/30',color:'text-yellow-400',icon:'⚠'},info:{bg:'bg-indigo-500/10',border:'border-indigo-500/30',color:'text-indigo-400',icon:'ℹ'}};const c=config[type];return(<div role="alert" aria-live="polite" className={\`flex items-start gap-3 px-4 py-3.5 border-l-[3px] shadow-xl \${c.bg} \${c.border}\`}><span className={\`text-sm flex-shrink-0 mt-0.5 \${c.color}\`}>{c.icon}</span><div className="flex-1"><p className="font-bold text-sm text-white">{title}</p><p className="italic text-[13px] text-white/60">{message}</p></div><button onClick={onDismiss} className="text-white/35 hover:text-white/60 text-sm leading-none">×</button></div>)}` }},
+
+// ─── TABS & ACCORDIONS ────────────────────────────────────
+{ id:'tb1', name:'Tabbed Interface', cat:'tabs', tags:['tabs','navigation','content'],
+  variants:['Underline','Pill','Boxed'],
+  defaultProps:{ accent:'#5558f0', style:'underline', tabs:'Overview,Analytics,Settings,Team' },
+  propSchema:[
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'style', label:'Style', type:'chips', options:['underline','pill','boxed'] },
+    { key:'tabs', label:'Tab labels (comma)', type:'text' },
+  ],
+  render(p){
+    const tabs=p.tabs.split(',').map(t=>t.trim());
+    const styleMap={
+      underline:`border-bottom:1.5px solid rgba(240,237,232,.1)`,
+      pill:`background:rgba(240,237,232,.05);padding:4px`,
+      boxed:`border:1px solid rgba(240,237,232,.1)`,
+    };
+    return `<div style="width:100%;max-width:560px">
+      <div style="display:flex;${styleMap[p.style]||styleMap.underline}">
+        ${tabs.map((t,i)=>{
+          const active=i===0;
+          const styleStr={
+            underline:`padding:10px 18px;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:${active?p.accent:'rgba(240,237,232,.4)'};border-bottom:2px solid ${active?p.accent:'transparent'};margin-bottom:-1.5px;cursor:pointer`,
+            pill:`padding:7px 16px;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:${active?'#fff':'rgba(240,237,232,.5)'};background:${active?p.accent:'transparent'};cursor:pointer`,
+            boxed:`padding:9px 18px;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:${active?p.accent:'rgba(240,237,232,.4)'};background:${active?p.accent+'15':'transparent'};cursor:pointer;border-right:1px solid rgba(240,237,232,.08)`,
+          }[p.style]||'';
+          return `<button style="${styleStr}" onclick="this.parentElement.querySelectorAll('button').forEach((b,j)=>b.style.color=j===${i}?'${p.accent}':'rgba(240,237,232,.4)')" role="tab" aria-selected="${active}">${t}</button>`;
+        }).join('')}
+      </div>
+      <div style="padding:20px 4px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:14px;color:rgba(240,237,232,.5)">Content for <strong style="color:#f0ede8">${tabs[0]}</strong> tab would render here.</div>
+      </div>
+    </div>`;
+  },
+  code:{ html:`<div class="tabs" role="tablist">
+  <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-overview">Overview</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-analytics">Analytics</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-settings">Settings</button>
+</div>
+<div id="tab-overview" class="tab-panel" role="tabpanel">
+  Content for Overview
+</div>`, css:`.tabs{display:flex;border-bottom:1.5px solid rgba(255,255,255,.1);}
+.tab{padding:10px 18px;font-family:monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);border-bottom:2px solid transparent;margin-bottom:-1.5px;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;}
+.tab.active{color:#5558f0;border-bottom-color:#5558f0;}
+.tab-panel{padding:20px 0;}`, tailwind:`flex border-b border-white/10 [&_.tab]:px-[18px] [&_.tab]:py-2.5 [&_.tab]:font-mono [&_.tab]:text-[9.5px] [&_.tab]:uppercase [&_.tab]:tracking-widest [&_.tab]:text-white/40 [&_.tab.active]:text-indigo-400 [&_.tab.active]:border-b-2 [&_.tab.active]:border-indigo-400 [&_.tab.active]:-mb-px`, react:`const [active,setActive]=useState(0);
+return(
+  <div>
+    <div className="flex border-b border-white/10" role="tablist">
+      {tabs.map((tab,i)=>(
+        <button key={tab.id} role="tab" aria-selected={active===i} onClick={()=>setActive(i)}
+          className={\`px-[18px] py-2.5 font-mono text-[9.5px] uppercase tracking-widest -mb-px border-b-2 transition-all \${active===i?'text-indigo-400 border-indigo-400':'text-white/40 border-transparent'}\`}>
+          {tab.label}
+        </button>
+      ))}
+    </div>
+    <div role="tabpanel" className="py-5">
+      {tabs[active].content}
+    </div>
+  </div>
+);` }},
+
+{ id:'ac1', name:'Accordion', cat:'tabs', tags:['accordion','faq','collapse'],
+  variants:['Default','Bordered','Flush'],
+  defaultProps:{ accent:'#5558f0', multi:false, items:'What is UIBlocks?,How do I export code?,Is it free?,Can I use in commercial projects?' },
+  propSchema:[
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'multi', label:'Allow multiple open', type:'toggle' },
+    { key:'items', label:'Items (comma)', type:'text' },
+  ],
+  render(p){
+    const items=p.items.split(',').map(t=>t.trim());
+    return `<div style="width:100%;max-width:560px">
+      ${items.map((item,i)=>`<div style="border-bottom:1px solid rgba(240,237,232,.1);${i===0?'border-top:1px solid rgba(240,237,232,.1)':''}">
+        <button onclick="const body=this.nextElementSibling;const open=body.style.maxHeight;body.style.maxHeight=open?'':'200px';body.style.padding=open?'0 0':'0 0 14px';this.querySelector('.acc-arrow').style.transform=open?'':'rotate(180deg)'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 4px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#f0ede8;background:transparent;text-align:left;cursor:pointer" aria-expanded="${i===0}">
+          ${item}
+          <span class="acc-arrow" style="color:${p.accent};font-size:12px;transition:transform .25s;transform:${i===0?'rotate(180deg)':''}">▾</span>
+        </button>
+        <div style="max-height:${i===0?'200px':'0'};overflow:hidden;transition:max-height .3s ease,padding .3s ease;padding:${i===0?'0 4px 14px':'0 4px 0'}">
+          <p style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:13.5px;color:rgba(240,237,232,.55);line-height:1.65">${i===0?'UIBlocks is a production-ready UI component library with live editing, 4-format code export, save, share, and daily challenges. Free for personal and commercial use.':'Click to expand this section and see the answer here. Content can be any HTML.'}</p>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  },
+  code:{ html:`<div class="accordion">
+  <div class="accordion-item">
+    <button class="accordion-trigger" aria-expanded="true" aria-controls="acc-1">
+      What is UIBlocks?
+      <span class="acc-icon" aria-hidden="true">▾</span>
+    </button>
+    <div id="acc-1" class="accordion-panel" role="region">
+      <p>UIBlocks is a production-ready component library...</p>
+    </div>
+  </div>
+</div>`, css:`.accordion-item{border-bottom:1px solid rgba(255,255,255,.1);}
+.accordion-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 0;font-weight:700;font-size:15px;color:#f0ede8;background:none;border:none;cursor:pointer;text-align:left;}
+.acc-icon{transition:transform .25s;color:#5558f0;}
+.accordion-trigger[aria-expanded=true] .acc-icon{transform:rotate(180deg);}
+.accordion-panel{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.accordion-trigger[aria-expanded=true]+.accordion-panel{max-height:500px;}`, tailwind:`divide-y divide-white/10 [&_.trigger]:flex [&_.trigger]:items-center [&_.trigger]:justify-between [&_.trigger]:w-full [&_.trigger]:py-3.5 [&_.trigger]:font-bold [&_.trigger]:text-white [&_.trigger]:text-left`, react:`export function Accordion({items,multi=false}){const [open,setOpen]=useState(multi?[]:null);const toggle=i=>multi?setOpen(o=>o.includes(i)?o.filter(x=>x!==i):[...o,i]):setOpen(o=>o===i?null:i);const isOpen=i=>multi?open.includes(i):open===i;return(<div className="divide-y divide-white/10">{items.map((item,i)=><div key={item.id}><button onClick={()=>toggle(i)} aria-expanded={isOpen(i)} className="flex items-center justify-between w-full py-3.5 font-bold text-white text-left"><span>{item.question}</span><span className={\`text-indigo-400 text-xs transition-transform \${isOpen(i)?'rotate-180':''}\`}>▾</span></button>{isOpen(i)&&<p className="italic text-[13.5px] text-white/55 leading-relaxed pb-3.5">{item.answer}</p>}</div>)}</div>)}` }},
+
+// ─── TIMELINES ────────────────────────────────────────────
+{ id:'tl1', name:'Vertical Timeline', cat:'timelines', tags:['timeline','history','steps'], isNew:true,
+  variants:['Default','Compact','With Icons'],
+  defaultProps:{ accent:'#5558f0', lineColor:'rgba(85,88,240,.3)', dotSize:12, events:'Launched Beta,Reached 1K users,Open-sourced library,v2 release — Component Library' },
+  propSchema:[
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'dotSize', label:'Dot size (px)', type:'range', min:8, max:20, step:2 },
+    { key:'events', label:'Events (comma)', type:'text' },
+  ],
+  render(p){
+    const evts=p.events.split(',').map(e=>e.trim());
+    const dates=['Jan 2024','Mar 2024','Jun 2024','Mar 2025'];
+    return `<div style="padding:0 20px;max-width:400px;width:100%">
+      ${evts.map((evt,i)=>`<div style="display:flex;gap:16px;padding-bottom:${i<evts.length-1?'28':'0'}px;position:relative">
+        ${i<evts.length-1?`<div style="position:absolute;left:${+p.dotSize/2-1}px;top:${+p.dotSize}px;bottom:0;width:1px;background:${p.lineColor}"></div>`:''}
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center">
+          <div style="width:${p.dotSize}px;height:${p.dotSize}px;border-radius:50%;background:${i===evts.length-1?p.accent:'rgba(85,88,240,.3)'};border:2px solid ${p.accent};z-index:1;transition:background .2s"></div>
+        </div>
+        <div style="padding-top:${+p.dotSize/2-8}px">
+          <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:${p.accent};margin-bottom:4px">${dates[i]||'2024'}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:${i===evts.length-1?'#f0ede8':'rgba(240,237,232,.7)'};">${evt}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:12px;color:rgba(240,237,232,.4);margin-top:3px">${i===evts.length-1?'Ongoing — latest release':'Milestone reached'}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  },
+  code:{ html:`<ol class="timeline">
+  <li class="timeline-item">
+    <div class="tl-dot"></div>
+    <div class="tl-content">
+      <time class="tl-date">Jan 2024</time>
+      <h3>Launched Beta</h3>
+      <p>Milestone reached</p>
+    </div>
+  </li>
+  <!-- more items -->
+</ol>`, css:`ol.timeline{list-style:none;padding:0 20px;}
+.timeline-item{display:flex;gap:16px;padding-bottom:28px;position:relative;}
+.timeline-item::before{content:'';position:absolute;left:5px;top:12px;bottom:0;width:1px;background:rgba(85,88,240,.3);}
+.timeline-item:last-child::before{display:none;}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:#5558f0;border:2px solid #5558f0;flex-shrink:0;z-index:1;}
+.tl-date{font-family:monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#5558f0;}`, tailwind:`space-y-7 [&_li]:flex [&_li]:gap-4 [&_li]:relative [&_.dot]:w-3 [&_.dot]:h-3 [&_.dot]:rounded-full [&_.dot]:bg-indigo-500 [&_.dot]:flex-shrink-0 [&_.dot]:z-10 [&_.dot]:mt-1`, react:`export function Timeline({events}){return(<ol className="space-y-7">{events.map((evt,i)=><li key={i} className="flex gap-4 relative"><div className={\`w-3 h-3 rounded-full flex-shrink-0 z-10 mt-1 border-2 border-indigo-500 \${i===events.length-1?'bg-indigo-500':'bg-transparent'}\`}/>{i<events.length-1&&<div className="absolute left-[5px] top-3 bottom-0 w-px bg-indigo-500/30"/>}<div><time className="font-mono text-[8px] uppercase tracking-widest text-indigo-400 block mb-1">{evt.date}</time><h3 className="font-bold text-sm text-white">{evt.title}</h3><p className="italic text-xs text-white/40 mt-0.5">{evt.subtitle}</p></div></li>)}</ol>)}` }},
+
+// ─── SIDEBARS ─────────────────────────────────────────────
+{ id:'sb1', name:'App Sidebar', cat:'sidebars', tags:['sidebar','nav','dashboard'], isNew:true,
+  variants:['Dark','Collapsed','With Sections'],
+  defaultProps:{ bg:'#111110', accent:'#5558f0', logo:'UIBlocks', showLogo:true, collapsed:false },
+  propSchema:[
+    { key:'bg', label:'Background', type:'color' },
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'logo', label:'Logo', type:'text' },
+    { key:'showLogo', label:'Show logo', type:'toggle' },
+    { key:'collapsed', label:'Collapsed', type:'toggle' },
+  ],
+  render(p){
+    const w=p.collapsed?'64px':'220px';
+    const items=[{icon:'⊞',label:'Dashboard',active:true},{icon:'⊟',label:'Components'},{icon:'📊',label:'Analytics'},{icon:'⚙',label:'Settings'},{icon:'?',label:'Help'}];
+    return `<div style="display:flex;height:320px;border:1px solid rgba(240,237,232,.08)">
+      <nav style="width:${w};background:${p.bg};border-right:1px solid rgba(240,237,232,.08);display:flex;flex-direction:column;overflow:hidden;transition:width .3s;flex-shrink:0" aria-label="App navigation">
+        ${p.showLogo&&!p.collapsed?`<div style="padding:16px 16px 12px;border-bottom:1px solid rgba(240,237,232,.08);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:#f0ede8;flex-shrink:0">${p.logo}</div>`:''}
+        ${p.collapsed?`<div style="padding:16px;text-align:center;border-bottom:1px solid rgba(240,237,232,.08);font-family:'Bebas Neue',sans-serif;font-size:20px;color:${p.accent}">◈</div>`:''}
+        <div style="flex:1;padding:8px 0;overflow-y:auto">
+          ${items.map(item=>`<div style="display:flex;align-items:center;gap:10px;padding:${p.collapsed?'10px':'8px 12px'};cursor:pointer;border-left:2px solid ${item.active?p.accent:'transparent'};background:${item.active?`${p.accent}14`:'transparent'};color:${item.active?p.accent:'rgba(240,237,232,.45)'};justify-content:${p.collapsed?'center':'flex-start'};transition:all .15s" onmouseover="if(!${item.active})this.style.color='rgba(240,237,232,.75)'" onmouseout="if(!${item.active})this.style.color='rgba(240,237,232,.45)'" role="link" aria-current="${item.active?'page':undefined}">
+            <span style="font-size:${p.collapsed?'18':'15'}px;flex-shrink:0" aria-hidden="true">${item.icon}</span>
+            ${!p.collapsed?`<span style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">${item.label}</span>`:''}
+          </div>`).join('')}
+        </div>
+        ${!p.collapsed?`<div style="padding:12px;border-top:1px solid rgba(240,237,232,.08);display:flex;align-items:center;gap:10px;flex-shrink:0">
+          <div style="width:28px;height:28px;background:${p.accent};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff;flex-shrink:0">JD</div>
+          <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#f0ede8">Jane Doe</div><div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(240,237,232,.35)">Pro plan</div></div>
+        </div>`:''}
+      </nav>
+      <div style="flex:1;background:#080807;padding:20px;display:flex;align-items:center;justify-content:center">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(240,237,232,.2)">Page content area</div>
+      </div>
+    </div>`;
+  },
+  code:{ html:`<div class="app-layout">
+  <nav class="sidebar" aria-label="App navigation">
+    <div class="sidebar-brand">UIBlocks</div>
+    <ul class="sidebar-nav">
+      <li class="nav-item active" aria-current="page">
+        <span aria-hidden="true">⊞</span> Dashboard
+      </li>
+      <li class="nav-item"><span aria-hidden="true">⊟</span> Components</li>
+    </ul>
+    <div class="sidebar-user">
+      <div class="avatar">JD</div>
+      <div><span>Jane Doe</span><span>Pro plan</span></div>
+    </div>
+  </nav>
+  <main class="page-content">...</main>
+</div>`, css:`.app-layout{display:flex;height:100vh;}
+.sidebar{width:220px;background:#111110;border-right:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;}
+.sidebar-brand{padding:16px;font-family:'Bebas Neue';font-size:22px;letter-spacing:.06em;color:#f0ede8;border-bottom:1px solid rgba(255,255,255,.08);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);border-left:2px solid transparent;}
+.nav-item.active{color:#5558f0;background:rgba(85,88,240,.08);border-left-color:#5558f0;}`, tailwind:`flex h-screen [&_.sidebar]:w-[220px] [&_.sidebar]:bg-neutral-950 [&_.sidebar]:border-r [&_.sidebar]:border-white/10 [&_.sidebar]:flex [&_.sidebar]:flex-col`, react:`export function AppSidebar({items,user,logo,collapsed}){return(<nav className={\`flex-shrink-0 flex flex-col bg-neutral-950 border-r border-white/10 transition-all \${collapsed?'w-16':'w-[220px]'}\`}><div className="p-4 border-b border-white/10">{collapsed?<Logo short/>:<Logo>{logo}</Logo>}</div><ul className="flex-1 py-2">{items.map(item=><SidebarItem key={item.id} item={item} collapsed={collapsed}/>)}</ul><UserFooter user={user} collapsed={collapsed}/></nav>)}` }},
+
+// ─── DASHBOARDS ───────────────────────────────────────────
+{ id:'db1', name:'Analytics Dashboard', cat:'dashboards', tags:['dashboard','analytics','chart'], isNew:true,
+  variants:['Dark','With Sidebar'],
+  defaultProps:{ accent:'#5558f0', color2:'#22c55e', color3:'#f59e0b', heading:'Analytics Overview' },
+  propSchema:[
+    { key:'accent', label:'Primary color', type:'color' },
+    { key:'color2', label:'Success color', type:'color' },
+    { key:'color3', label:'Warning color', type:'color' },
+    { key:'heading', label:'Heading', type:'text' },
+  ],
+  render(p){
+    const stats=[{l:'Total Users',v:'24.8K',d:'+12%',c:p.color2},{l:'Revenue',v:'$48.2K',d:'+8.4%',c:p.color2},{l:'Bounce Rate',v:'34.1%',d:'-3.2%',c:p.color3},{l:'Sessions',v:'182K',d:'+22%',c:p.color2}];
+    const bars=[60,80,45,90,55,75,65,85,40,70,50,88];
+    return `<div style="width:100%;max-width:760px;background:#111110;border:1px solid rgba(240,237,232,.08)">
+      <div style="padding:16px 20px;border-bottom:1px solid rgba(240,237,232,.08);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:#f0ede8">${p.heading}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border:1px solid rgba(240,237,232,.12);color:rgba(240,237,232,.5)">Last 30 days</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(240,237,232,.08);margin-bottom:1px">
+        ${stats.map(s=>`<div style="background:#111110;padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:rgba(240,237,232,.4)">${s.l}</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;color:#f0ede8;line-height:1">${s.v}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:${s.c}">${s.d}</div>
+        </div>`).join('')}
+      </div>
+      <div style="padding:16px 20px;background:#111110">
+        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:rgba(240,237,232,.4);margin-bottom:12px">Sessions per day</div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:72px">
+          ${bars.map((v,i)=>`<div style="flex:1;background:${i===bars.length-1?p.accent:`${p.accent}55`};height:${v}%;transition:height .3s;cursor:pointer" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'" title="${v}% of peak" role="img" aria-label="${v}% of peak"></div>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px">
+          ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map(m=>`<span style="font-family:'Space Mono',monospace;font-size:7px;color:rgba(240,237,232,.3)">${m}</span>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  },
+  code:{ html:`<div class="dashboard">
+  <header class="dash-header">
+    <h1>Analytics Overview</h1>
+    <button>Last 30 days</button>
+  </header>
+  <div class="stats-grid">
+    <div class="stat-card">...</div>
+    <!-- 4 stat cards -->
+  </div>
+  <div class="chart-area">
+    <p class="chart-title">Sessions per day</p>
+    <div class="bar-chart" role="img" aria-label="Bar chart showing sessions">
+      <!-- bars -->
+    </div>
+  </div>
+</div>`, css:`.dashboard{background:#111110;border:1px solid rgba(255,255,255,.08);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.08);}
+.stat-card{background:#111110;padding:16px;}
+.bar-chart{display:flex;align-items:flex-end;gap:3px;height:72px;}
+.bar{flex:1;background:#5558f0;transition:height .3s;}`, tailwind:`bg-neutral-950 border border-white/10 [&_.stats]:grid [&_.stats]:grid-cols-4 [&_.stats]:gap-px [&_.stats]:bg-white/10`, react:`export function Dashboard({stats,chartData,heading}){return(<div className="bg-neutral-950 border border-white/10"><header className="flex items-center justify-between px-5 py-4 border-b border-white/10"><h1 className="font-display text-2xl">{heading}</h1></header><div className="grid grid-cols-4 gap-px bg-white/10">{stats.map(s=><StatCard key={s.label} {...s}/>)}</div><BarChart data={chartData}/></div>)}` }},
+
+// ─── PAGE LAYOUTS ──────────────────────────────────────────
+{ id:'pl1', name:'Landing Page Shell', cat:'layouts', tags:['layout','landing','full-page'], isNew:true,
+  variants:['Dark','Light','Minimal'],
+  defaultProps:{ accent:'#5558f0', bg:'#080807', heading:'Ship faster.\nDesign better.', cta:'Get started free' },
+  propSchema:[
+    { key:'accent', label:'Accent', type:'color' },
+    { key:'bg', label:'Background', type:'color' },
+    { key:'heading', label:'Heading', type:'text' },
+    { key:'cta', label:'CTA', type:'text' },
+  ],
+  render(p){
+    return `<div style="width:100%;max-width:860px;background:${p.bg};border:1px solid rgba(240,237,232,.08);overflow:hidden">
+      <nav style="padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(240,237,232,.06)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:#f0ede8">UI<span style="color:${p.accent}">BLOCKS</span></div>
+        <div style="display:flex;gap:20px">${['Features','Pricing','Docs'].map(l=>`<span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,232,.45)">${l}</span>`).join('')}</div>
+        <button style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;padding:7px 16px;background:${p.accent};color:#fff;border:none;cursor:pointer">Sign up</button>
+      </nav>
+      <section style="padding:48px 40px;text-align:center;border-bottom:1px solid rgba(240,237,232,.06);background-image:repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(240,237,232,.025) 47px,rgba(240,237,232,.025) 48px)">
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);line-height:.9;letter-spacing:.03em;color:#f0ede8;margin-bottom:20px">${p.heading.replace(/\n/,'<br>')}</h1>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:16px;color:rgba(240,237,232,.5);max-width:360px;margin:0 auto 28px;line-height:1.6">Build production UI components in minutes, not days.</p>
+        <button style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:12px 32px;background:${p.accent};color:#fff;border:none;cursor:pointer">${p.cta} →</button>
+      </section>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(240,237,232,.06)">
+        ${['100+','3','0'].map((v,i)=>`<div style="background:${p.bg};padding:20px;text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${p.accent}">${v}${['','formats','deps'][i]}</div><div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(240,237,232,.35);margin-top:4px">${['Components','Output','Dependencies'][i]}</div></div>`).join('')}
+      </div>
+      <footer style="padding:14px 24px;border-top:1px solid rgba(240,237,232,.06);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,232,.25)">© 2025 UIBlocks</span>
+        <span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:${p.accent}">Made with UIForge</span>
+      </footer>
+    </div>`;
+  },
+  code:{ html:`<!DOCTYPE html>
+<html lang="en">
+<head><title>Landing Page</title></head>
+<body>
+  <nav class="navbar">...</nav>
+  <section class="hero">
+    <h1>Ship faster.<br>Design better.</h1>
+    <p>Build production UI components in minutes.</p>
+    <button>Get started free →</button>
+  </section>
+  <section class="stats-strip">
+    <div class="stat">100+ Components</div>
+    <div class="stat">3 Formats</div>
+    <div class="stat">0 Dependencies</div>
+  </section>
+  <footer>...</footer>
+</body>
+</html>`, css:`/* See individual component CSS for navbar, hero, stats */
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.06);}
+.stat{padding:20px;text-align:center;background:#080807;}`, tailwind:`grid grid-cols-3 gap-px bg-white/[0.06] [&_.stat]:p-5 [&_.stat]:text-center [&_.stat]:bg-[#080807]`, react:`export default function LandingPage(){return(<><Navbar/><Hero/><StatStrip stats={[{v:'100+',l:'Components'},{v:'3',l:'Formats'},{v:'0',l:'Dependencies'}]}/><Footer/></>)}` }},
+
+];
+
+// ─── CHALLENGE SYSTEM ──────────────────────────────────────
+const CHALLENGES = [
+  { id:'c1', text:'Build a <strong>dark login form</strong> with social auth buttons and validation states.', hint:'Use the Login Form component and toggle "Show Social".' },
+  { id:'c2', text:'Create a <strong>pricing table</strong> with 3 tiers — highlight the middle tier.', hint:'Set highlighted plan to "Pro" in the Pricing Table.' },
+  { id:'c3', text:'Design a <strong>hero section</strong> using a gradient mesh background with 3 colors.', hint:'Try the Gradient Mesh Hero and adjust color1, color2, color3.' },
+  { id:'c4', text:'Build a <strong>sidebar navigation</strong> and toggle it to collapsed mode.', hint:'Use App Sidebar and enable "Collapsed" toggle.' },
+  { id:'c5', text:'Create an <strong>analytics dashboard</strong> and change the primary stat color to emerald green.', hint:'Use Analytics Dashboard and set Primary color to #10b981.' },
+  { id:'c6', text:'Stack <strong>3 toast notifications</strong> — one success, one warning, one error.', hint:'Open Toast Notification Stack and switch variants.' },
+  { id:'c7', text:'Build a <strong>4-column product card grid</strong> by customising the Product Card.', hint:'Customise the Product Card and explore the variant switcher.' },
+  { id:'c8', text:'Create a <strong>centered-logo navbar</strong> with 4 left links and 4 right links.', hint:'Use Centered Logo Nav and update the links field.' },
+  { id:'c9', text:'Assemble a <strong>full landing page</strong> — use the Landing Page Shell and swap the accent color.', hint:'Use Page Layouts → Landing Page Shell.' },
+  { id:'c10', text:'Build a <strong>vertical timeline</strong> with 5 milestones and a custom accent color.', hint:'Use Vertical Timeline and add 5 comma-separated events.' },
+];
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let activeCategory = 'all';
+let viewMode = 'grid';
+let activeComp = null;
+let activeProps = {};
+let activeVariantIdx = 0;
+let activeCodeTab = 'html';
+let savedIds = [];
+let challengeActive = false;
+let challengeIdx = 0;
+let challengeTimer = null;
+let challengeSecs = 300;
+let filterOnlyNew = false;
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  loadSaved();
+  buildSidebar();
+  renderGrid('all');
+  setupKeyboard();
+  checkUrlHash();
+});
+
+function checkUrlHash() {
+  const h = location.hash.replace('#','');
+  if (h && COMPS.find(c => c.id === h)) openDetail(h);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════
+function buildSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  const total = COMPS.length;
+  document.getElementById('sidebarCount').textContent = `${total} components`;
+
+  nav.innerHTML = CATS.map(cat => {
+    const count = cat.id === 'all' ? total : COMPS.filter(c => c.cat === cat.id).length;
+    if (count === 0 && cat.id !== 'all') return '';
+    return `<div class="sidebar-item ${cat.id === 'all' ? 'active' : ''}" 
+      onclick="selectCat('${cat.id}',this)" 
+      role="listitem button" 
+      aria-label="Show ${cat.label} (${count})"
+      tabindex="0"
+      onkeydown="if(event.key==='Enter')selectCat('${cat.id}',this)">
+      <span>${cat.icon} ${cat.label}</span>
+      <span class="si-count">${count}</span>
+      ${cat.isNew ? '<span class="badge badge-new">New</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function selectCat(id, el) {
+  activeCategory = id;
+  filterOnlyNew = false;
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid(id);
+}
+
+// ═══════════════════════════════════════════════════════════
+// GRID RENDER
+// ═══════════════════════════════════════════════════════════
+function renderGrid(cat) {
+  let comps = cat === 'all' ? COMPS : COMPS.filter(c => c.cat === cat);
+  if (filterOnlyNew) comps = comps.filter(c => c.isNew);
+
+  const catObj = CATS.find(c => c.id === cat);
+  const title = catObj ? catObj.label.toUpperCase() : 'ALL COMPONENTS';
+  document.getElementById('toolbarTitle').innerHTML = title.includes(' ')
+    ? `${title.split(' ')[0]} <span>${title.split(' ').slice(1).join(' ')}</span>`
+    : title;
+  document.getElementById('toolbarCount').textContent = `${comps.length} component${comps.length !== 1 ? 's' : ''}`;
+
+  const area = document.getElementById('compArea');
+  area.className = `comp-area ${viewMode === 'grid' ? 'comp-grid-view' : 'comp-list-view'}`;
+
+  if (comps.length === 0) {
+    area.innerHTML = `<div class="empty-state"><div class="empty-icon">⊟</div><div class="empty-title">Nothing here</div><div class="empty-desc">No components match this filter</div></div>`;
+    return;
+  }
+
+  area.innerHTML = comps.map(comp => viewMode === 'grid' ? renderCard(comp) : renderListItem(comp)).join('');
+  area.querySelectorAll('.cc, .cc-list').forEach(el => el.classList.add('anim-in'));
+}
+
+function renderCard(comp) {
+  const preview = comp.render(comp.defaultProps);
+  const isSaved = savedIds.includes(comp.id);
+  return `<div class="cc" style="--cc-color:${comp.defaultProps.accent || '#5558f0'}" role="listitem">
+    <div class="cc-top-bar" aria-hidden="true"></div>
+    <div class="cc-preview" onclick="openDetail('${comp.id}')" role="button" tabindex="0" aria-label="Open ${comp.name}" onkeydown="if(event.key==='Enter')openDetail('${comp.id}')">
+      <div class="cc-preview-grid" aria-hidden="true"></div>
+      <div style="transform:scale(.62);transform-origin:center;pointer-events:none;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;max-height:140px">${preview}</div>
+      <div class="cc-expand-hint" aria-hidden="true">Click to edit →</div>
+    </div>
+    <div class="cc-meta">
+      <div class="cc-name">${comp.name}</div>
+      <div class="cc-tags">${(comp.tags || []).slice(0,3).map(t => `<span class="cc-tag">${t}</span>`).join('')}${comp.isNew ? '<span class="badge badge-new">New</span>' : ''}</div>
+    </div>
+    <div class="cc-actions">
+      <button class="cc-btn primary" onclick="openDetail('${comp.id}')" aria-label="Edit ${comp.name}">Edit &amp; Copy</button>
+      <button class="cc-btn ${isSaved ? 'saved' : ''}" id="save-${comp.id}" onclick="toggleSaveComp('${comp.id}')" aria-label="${isSaved ? 'Remove from saved' : 'Save'} ${comp.name}">${isSaved ? '★ Saved' : '☆ Save'}</button>
+    </div>
+  </div>`;
+}
+
+function renderListItem(comp) {
+  const preview = comp.render(comp.defaultProps);
+  return `<div class="cc-list" onclick="openDetail('${comp.id}')" role="listitem button" tabindex="0" aria-label="Open ${comp.name}">
+    <div class="cc-list-preview">${preview.substring(0,200)}</div>
+    <div style="flex:1">
+      <div class="cc-list-name">${comp.name}</div>
+      <div class="cc-list-meta">${(comp.tags||[]).map(t=>`<span class="cc-tag">${t}</span>`).join('')}${comp.isNew?'<span class="badge badge-new">New</span>':''}</div>
+    </div>
+    <div class="cc-list-actions">
+      <button class="cc-btn primary" onclick="event.stopPropagation();openDetail('${comp.id}')" aria-label="Edit ${comp.name}">Edit</button>
+      <button class="cc-btn" onclick="event.stopPropagation();toggleSaveComp('${comp.id}')" aria-label="Save ${comp.name}">★</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DETAIL VIEW
+// ═══════════════════════════════════════════════════════════
+function openDetail(id) {
+  const comp = COMPS.find(c => c.id === id);
+  if (!comp) return;
+
+  activeComp = comp;
+  activeProps = { ...comp.defaultProps };
+  activeVariantIdx = 0;
+
+  // Title & save state
+  document.getElementById('detailTitle').textContent = comp.name;
+  updateDetailSaveBtn();
+
+  // Variants
+  const sel = document.getElementById('variantSelect');
+  sel.innerHTML = (comp.variants || ['Default']).map((v,i) => `<option value="${i}">${v}</option>`).join('');
+
+  // Variant buttons in editor
+  document.getElementById('epVariantsBody').innerHTML = (comp.variants || ['Default']).map((v,i) =>
+    `<button class="prop-chip ${i===0?'active':''}" onclick="switchVariant(${i},this)">${v}</button>`
+  ).join('');
+
+  // Build prop editor
+  buildPropEditor(comp);
+
+  // Info panel
+  document.getElementById('epInfoBody').innerHTML = `
+    <div class="prop-row"><span class="prop-label">Category</span><span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${CATS.find(c=>c.id===comp.cat)?.label || comp.cat}</span></div>
+    <div class="prop-row"><span class="prop-label">Tags</span><div class="cc-tags" style="margin-top:4px">${(comp.tags||[]).map(t=>`<span class="cc-tag">${t}</span>`).join('')}</div></div>
+    <div class="prop-row"><span class="prop-label">Variants</span><span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${(comp.variants||['Default']).length}</span></div>
+  `;
+
+  // Update preview and code
+  updatePreview();
+  updateCode();
+
+  // Open modal
+  document.getElementById('detailBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // URL hash
+  try { history.replaceState(null, comp.name, '#' + comp.id); } catch(e) {}
+}
+
+function closeDetail(e) {
+  if (e && e.target !== document.getElementById('detailBackdrop')) return;
+  document.getElementById('detailBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+  try { history.replaceState(null, 'UIBlocks', location.pathname); } catch(e) {}
+}
+
+function buildPropEditor(comp) {
+  const body = document.getElementById('epPropsBody');
+  body.innerHTML = '';
+
+  (comp.propSchema || []).forEach(prop => {
+    const val = activeProps[prop.key];
+    const row = document.createElement('div');
+    row.className = 'prop-row';
+
+    let ctrl = '';
+    switch(prop.type) {
+      case 'color':
+        ctrl = `<div class="prop-color">
+          <input type="color" value="${val}" onchange="setProp('${prop.key}',this.value);syncColorText('${prop.key}')" id="pc-${prop.key}" aria-label="${prop.label} color picker">
+          <input type="text" value="${val}" onchange="setProp('${prop.key}',this.value);syncColorPicker('${prop.key}')" id="pt-${prop.key}" aria-label="${prop.label} hex value">
+        </div>`;
+        break;
+      case 'range':
+        ctrl = `<input type="range" min="${prop.min||0}" max="${prop.max||100}" step="${prop.step||1}" value="${val}" 
+          oninput="setProp('${prop.key}',this.value);document.getElementById('pv-${prop.key}').textContent=this.value" 
+          aria-label="${prop.label}">`;
+        break;
+      case 'text':
+        ctrl = `<input type="text" class="prop-select" value="${escHtml(String(val))}" 
+          oninput="setProp('${prop.key}',this.value)" aria-label="${prop.label}">`;
+        break;
+      case 'select':
+        ctrl = `<select class="prop-select" onchange="setProp('${prop.key}',this.value)" aria-label="${prop.label}">
+          ${(prop.options||[]).map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('')}
+        </select>`;
+        break;
+      case 'chips':
+        ctrl = `<div class="prop-chips">${(prop.options||[]).map(o=>`<button class="prop-chip ${o===val?'active':''}" 
+          onclick="setProp('${prop.key}','${o}');this.parentElement.querySelectorAll('.prop-chip').forEach(c=>c.classList.remove('active'));this.classList.add('active')"
+          aria-pressed="${o===val}">${o}</button>`).join('')}</div>`;
+        break;
+      case 'toggle':
+        ctrl = `<div class="prop-toggle-row">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${prop.label}</span>
+          <button class="prop-toggle ${val?'on':''}" id="tog-${prop.key}" 
+            onclick="setProp('${prop.key}',!${val});this.classList.toggle('on')"
+            role="switch" aria-checked="${val}" aria-label="Toggle ${prop.label}"></button>
+        </div>`;
+        break;
+    }
+
+    if (prop.type !== 'toggle') {
+      row.innerHTML = `<div class="prop-label">${prop.label} ${prop.type==='range'?`<span id="pv-${prop.key}" class="prop-val">${val}</span>`:''}</div>${ctrl}`;
+    } else {
+      row.innerHTML = ctrl;
+    }
+    body.appendChild(row);
+  });
+
+  // Reset button
+  const reset = document.createElement('button');
+  reset.className = 'ep-reset-btn';
+  reset.textContent = '↺ Reset to defaults';
+  reset.setAttribute('aria-label', 'Reset all props to default values');
+  reset.onclick = () => { activeProps = {...activeComp.defaultProps}; buildPropEditor(activeComp); updatePreview(); updateCode(); };
+  body.appendChild(reset);
+}
+
+function setProp(key, val) {
+  activeProps[key] = val;
+  updatePreview();
+  updateCode();
+}
+
+function syncColorText(key) {
+  const input = document.getElementById('pt-'+key);
+  if (input) input.value = document.getElementById('pc-'+key).value;
+}
+
+function syncColorPicker(key) {
+  const v = document.getElementById('pt-'+key)?.value;
+  if (v && /^#[0-9a-f]{6}$/i.test(v)) {
+    const cp = document.getElementById('pc-'+key);
+    if (cp) cp.value = v;
+  }
+}
+
+function updatePreview() {
+  if (!activeComp) return;
+  try {
+    const html = activeComp.render(activeProps);
+    document.getElementById('dpPreviewInner').innerHTML = html;
+  } catch(e) {
+    document.getElementById('dpPreviewInner').innerHTML = `<div style="font-family:var(--mono);font-size:10px;color:var(--red)">Preview error: ${escHtml(e.message)}</div>`;
+  }
+}
+
+function updateCode() {
+  if (!activeComp) return;
+  const c = activeComp.code || {};
+  const htmlStr = c.html || '';
+  const cssStr = c.css || '';
+  const twStr = c.tailwind || '';
+  const reactStr = c.react || '';
+
+  document.getElementById('codeHtml').textContent = htmlStr;
+  document.getElementById('codeCss').textContent = cssStr;
+  document.getElementById('codeTailwind').textContent = twStr;
+  document.getElementById('codeReact').textContent = reactStr;
+
+  const active = activeCodeTab;
+  const lines = { html: htmlStr, css: cssStr, tailwind: twStr, react: reactStr }[active] || '';
+  document.getElementById('codeMeta').textContent = `${active.toUpperCase()} · ${lines.split('\n').length} lines`;
+}
+
+function switchCodeTab(tab, btn) {
+  activeCodeTab = tab;
+  document.querySelectorAll('.code-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+  document.querySelectorAll('.code-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  const pane = document.getElementById('code-' + tab);
+  if (pane) pane.classList.add('active');
+  updateCode();
+}
+
+function copyCode() {
+  if (!activeComp) return;
+  const c = activeComp.code || {};
+  const text = { html: c.html, css: c.css, tailwind: c.tailwind, react: c.react }[activeCodeTab] || '';
+  navigator.clipboard.writeText(text).catch(() => {});
+  const btn = document.getElementById('codeCopyBtn');
+  btn.textContent = '✓ Copied!';
+  btn.classList.add('done');
+  setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1500);
+}
+
+function changeVariant(idx) {
+  activeVariantIdx = +idx;
+  document.querySelectorAll('#epVariantsBody .prop-chip').forEach((c,i) => c.classList.toggle('active', i===activeVariantIdx));
+  updatePreview();
+}
+
+function switchVariant(idx, btn) {
+  activeVariantIdx = idx;
+  document.getElementById('variantSelect').value = idx;
+  document.querySelectorAll('#epVariantsBody .prop-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  updatePreview();
+}
+
+function setBg(btn, cls) {
+  const area = document.getElementById('dpPreviewArea');
+  area.className = 'dp-preview-area ' + cls;
+  document.querySelectorAll('.dp-bg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleSection(id) {
+  const sec = document.getElementById(id);
+  const isCollapsed = sec.classList.toggle('collapsed');
+  const hd = sec.querySelector('.ep-section-hd');
+  if (hd) hd.setAttribute('aria-expanded', !isCollapsed);
+}
+
+function updateDetailSaveBtn() {
+  const btn = document.getElementById('detailSaveBtn');
+  if (!btn || !activeComp) return;
+  const saved = savedIds.includes(activeComp.id);
+  btn.textContent = saved ? '★ Saved' : '☆ Save';
+  btn.style.color = saved ? 'var(--volt)' : '';
+  btn.style.borderColor = saved ? 'var(--volt)' : '';
+}
+
+function shareComp() {
+  if (!activeComp) return;
+  const url = `${location.origin}${location.pathname}#${activeComp.id}`;
+  navigator.clipboard.writeText(url).catch(()=>{});
+  const btn = document.querySelector('.code-share');
+  if (btn) { btn.textContent = '✓ Link copied!'; setTimeout(() => btn.textContent = '⬀ Share', 1500); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE SYSTEM
+// ═══════════════════════════════════════════════════════════
+function loadSaved() {
+  try { savedIds = JSON.parse(localStorage.getItem('uiblocks-saved') || '[]'); }
+  catch(e) { savedIds = []; }
+  updateSavedCount();
+}
+
+function persistSaved() {
+  try { localStorage.setItem('uiblocks-saved', JSON.stringify(savedIds)); }
+  catch(e) {}
+}
+
+function toggleSaveComp(id) {
+  const targetId = id || (activeComp ? activeComp.id : null);
+  if (!targetId) return;
+  if (savedIds.includes(targetId)) {
+    savedIds = savedIds.filter(x => x !== targetId);
+  } else {
+    savedIds.push(targetId);
+  }
+  persistSaved();
+  updateSavedCount();
+  updateDetailSaveBtn();
+
+  // Update grid button if visible
+  const btn = document.getElementById('save-' + targetId);
+  if (btn) {
+    const saved = savedIds.includes(targetId);
+    btn.textContent = saved ? '★ Saved' : '☆ Save';
+    btn.className = `cc-btn ${saved ? 'saved' : ''}`;
+    btn.setAttribute('aria-label', `${saved ? 'Remove from saved' : 'Save'} component`);
+  }
+  renderSavedList();
+}
+
+function updateSavedCount() {
+  document.getElementById('savedCount').textContent = savedIds.length;
+}
+
+function renderSavedList() {
+  const list = document.getElementById('savedList');
+  if (savedIds.length === 0) {
+    list.innerHTML = `<div class="saved-empty">No saved components yet.<br>Click ☆ on any card to save.</div>`;
+    return;
+  }
+  list.innerHTML = savedIds.map(id => {
+    const comp = COMPS.find(c => c.id === id);
+    if (!comp) return '';
+    const cat = CATS.find(c => c.id === comp.cat);
+    return `<div class="saved-item" role="listitem">
+      <div style="flex:1">
+        <div class="saved-item-name">${comp.name}</div>
+        <div class="saved-item-cat">${cat?.label || comp.cat}</div>
+      </div>
+      <button class="cc-btn primary" style="padding:4px 10px;font-size:7.5px" onclick="openDetail('${id}')" aria-label="Open ${comp.name}">Open</button>
+      <button class="saved-item-remove" onclick="toggleSaveComp('${id}')" aria-label="Remove ${comp.name} from saved">×</button>
+    </div>`;
+  }).join('');
+}
+
+function toggleSaved() {
+  const panel = document.getElementById('savedPanel');
+  panel.classList.toggle('open');
+  renderSavedList();
+}
+
+function exportSaved(format) {
+  const comps = savedIds.map(id => COMPS.find(c => c.id === id)).filter(Boolean);
+  if (comps.length === 0) return;
+
+  let content, filename, mime;
+  if (format === 'html') {
+    content = `<!DOCTYPE html>\n<html lang="en">\n<head><meta charset="UTF-8"><title>Saved Components</title></head>\n<body>\n` +
+      comps.map(c => `<!-- ${c.name} -->\n${c.code?.html || ''}\n`).join('\n') +
+      `</body>\n</html>`;
+    filename = 'uiblocks-saved.html';
+    mime = 'text/html';
+  } else {
+    content = JSON.stringify(comps.map(c => ({ id: c.id, name: c.name, cat: c.cat, code: c.code })), null, 2);
+    filename = 'uiblocks-saved.json';
+    mime = 'application/json';
+  }
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearSaved() {
+  savedIds = [];
+  persistSaved();
+  updateSavedCount();
+  renderSavedList();
+  renderGrid(activeCategory);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════
+function searchComps(q) {
+  q = q.toLowerCase().trim();
+  const area = document.getElementById('compArea');
+
+  if (!q) { renderGrid(activeCategory); return; }
+
+  let comps = activeCategory === 'all' ? COMPS : COMPS.filter(c => c.cat === activeCategory);
+  const matched = comps.filter(c =>
+    c.name.toLowerCase().includes(q) ||
+    (c.tags || []).some(t => t.toLowerCase().includes(q)) ||
+    (CATS.find(cat => cat.id === c.cat)?.label || '').toLowerCase().includes(q)
+  );
+
+  document.getElementById('toolbarCount').textContent = `${matched.length} result${matched.length!==1?'s':''}`;
+  area.innerHTML = matched.length === 0
+    ? `<div class="empty-state"><div class="empty-icon">⌕</div><div class="empty-title">No results</div><div class="empty-desc">Try a different search term</div></div>`
+    : matched.map(renderCard).join('');
+  area.querySelectorAll('.cc').forEach(el => el.classList.add('anim-in'));
+}
+
+// ═══════════════════════════════════════════════════════════
+// RANDOM GENERATOR
+// ═══════════════════════════════════════════════════════════
+function randomComp() {
+  const idx = Math.floor(Math.random() * COMPS.length);
+  openDetail(COMPS[idx].id);
+  const area = document.getElementById('dpPreviewInner');
+  area.classList.add('rng-flash');
+  setTimeout(() => area.classList.remove('rng-flash'), 400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILTER NEW
+// ═══════════════════════════════════════════════════════════
+function filterNew() {
+  filterOnlyNew = !filterOnlyNew;
+  const btn = document.getElementById('filterNewBtn');
+  btn.classList.toggle('tbtn', true);
+  btn.style.borderColor = filterOnlyNew ? 'var(--volt)' : '';
+  btn.style.color = filterOnlyNew ? 'var(--volt)' : '';
+  renderGrid(activeCategory);
+}
+
+// ═══════════════════════════════════════════════════════════
+// VIEW MODE
+// ═══════════════════════════════════════════════════════════
+function setView(mode) {
+  viewMode = mode;
+  document.getElementById('vt-grid').classList.toggle('active', mode==='grid');
+  document.getElementById('vt-list').classList.toggle('active', mode==='list');
+  renderGrid(activeCategory);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHALLENGE SYSTEM
+// ═══════════════════════════════════════════════════════════
+function toggleChallenge() {
+  challengeActive = !challengeActive;
+  const bar = document.getElementById('challengeBar');
+  const btn = document.getElementById('challengeBtn');
+  bar.style.display = challengeActive ? 'flex' : 'none';
+  btn.classList.toggle('active', challengeActive);
+  if (challengeActive) startChallenge();
+  else stopChallenge();
+}
+
+function startChallenge() {
+  const c = CHALLENGES[challengeIdx % CHALLENGES.length];
+  document.getElementById('challengeText').innerHTML = c.text;
+  challengeSecs = 300;
+  updateChallengeTimer();
+  clearInterval(challengeTimer);
+  challengeTimer = setInterval(() => {
+    challengeSecs--;
+    updateChallengeTimer();
+    if (challengeSecs <= 0) { nextChallenge(); }
+  }, 1000);
+}
+
+function stopChallenge() {
+  clearInterval(challengeTimer);
+  challengeTimer = null;
+}
+
+function nextChallenge() {
+  challengeIdx = (challengeIdx + 1) % CHALLENGES.length;
+  startChallenge();
+}
+
+function updateChallengeTimer() {
+  const m = Math.floor(challengeSecs / 60);
+  const s = challengeSecs % 60;
+  document.getElementById('challengeTimer').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════════════════
+function setupKeyboard() {
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('globalSearch').focus();
+    }
+    if (e.key === 'Escape') {
+      const backdrop = document.getElementById('detailBackdrop');
+      if (backdrop.classList.contains('open')) closeDetail();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════════
+// THEME TOGGLE
+// ═══════════════════════════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.dataset.theme === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  html.dataset.theme = next;
+  try { localStorage.setItem('uiblocks-theme', next); } catch(e) {}
+  updateThemeBtn();
+}
+
+function updateThemeBtn() {
+  const btn = document.getElementById('themeToggleBtn');
+  if (!btn) return;
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  btn.textContent = isDark ? '☀ Light' : '☾ Dark';
+  btn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+}
+
+function initTheme() {
+  let theme = 'dark';
+  try { theme = localStorage.getItem('uiblocks-theme') || theme; } catch(e) {}
+  // Respect system preference if no stored preference
+  if (!localStorage.getItem('uiblocks-theme')) {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      theme = 'light';
+    }
+  }
+  document.documentElement.dataset.theme = theme;
+  updateThemeBtn();
+}
+
+// Run immediately (before DOMContentLoaded to avoid flash)
+initTheme();
+
+// Listen for system theme changes
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+    // Only auto-switch if user hasn't manually set a preference
+    try { if (!localStorage.getItem('uiblocks-theme')) {
+      document.documentElement.dataset.theme = e.matches ? 'light' : 'dark';
+      updateThemeBtn();
+    }} catch(err) {}
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// RECENTLY VIEWED
+// ═══════════════════════════════════════════════════════════
+let recentlyViewed = [];
+function trackRecent(id) {
+  recentlyViewed = [id, ...recentlyViewed.filter(x => x !== id)].slice(0, 6);
+  renderRecentStrip();
+}
+function renderRecentStrip() {
+  const strip = document.getElementById('recentStrip');
+  const items = document.getElementById('recentItems');
+  if (!items) return;
+  if (recentlyViewed.length <= 1) { strip.style.display = 'none'; return; }
+  strip.style.display = 'flex';
+  items.innerHTML = recentlyViewed.slice(1).map(id => {
+    const c = COMPS.find(x => x.id === id);
+    return c ? `<button class="recent-item" onclick="openDetail('${id}')" aria-label="Reopen ${c.name}">${c.name}</button>` : '';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST FEEDBACK
+// ═══════════════════════════════════════════════════════════
+let _toastTimeout = null;
+function showToast(msg, duration=2000) {
+  let t = document.getElementById('globalToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'globalToast';
+    t.className = 'toast-flash';
+    t.setAttribute('role','status');
+    t.setAttribute('aria-live','polite');
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.animation = 'none';
+  t.offsetHeight;
+  t.style.animation = 'toastPop .25s ease both';
+  clearTimeout(_toastTimeout);
+  _toastTimeout = setTimeout(() => {
+    t.style.transition = 'opacity .3s';
+    t.style.opacity = '0';
+    setTimeout(() => { t.style.opacity=''; t.style.transition=''; }, 300);
+  }, duration);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ENHANCED COPY WITH TOAST
+// ═══════════════════════════════════════════════════════════
+const _origCopyCode = copyCode;
+copyCode = function() {
+  if (!activeComp) return;
+  const c = activeComp.code || {};
+  const text = {html:c.html,css:c.css,tailwind:c.tailwind,react:c.react}[activeCodeTab] || '';
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✓ ' + activeCodeTab.toUpperCase() + ' copied to clipboard');
+    const btn = document.getElementById('codeCopyBtn');
+    if (btn) { btn.textContent='✓ Copied!'; btn.classList.add('done'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done');},1500); }
+    const pane = document.getElementById('code-' + activeCodeTab);
+    if (pane) { pane.classList.add('copy-flash'); setTimeout(()=>pane.classList.remove('copy-flash'),500); }
+  }).catch(() => showToast('Copy failed — select text manually'));
+};
+
+// ═══════════════════════════════════════════════════════════
+// RESPONSIVE PREVIEW WIDTH
+// ═══════════════════════════════════════════════════════════
+function setPreviewWidth(btn, width) {
+  const inner = document.getElementById('dpPreviewInner');
+  if (inner) { inner.style.maxWidth=width; inner.style.width=width==='100%'?'100%':width; }
+  document.querySelectorAll('.bp-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  showToast('Preview: ' + btn.textContent + ' (' + width + ')');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MOBILE SIDEBAR
+// ═══════════════════════════════════════════════════════════
+function toggleMobileSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const btn = document.getElementById('mobileSidebarBtn');
+  const isOpen = sidebar.classList.toggle('mobile-open');
+  if (overlay) overlay.classList.toggle('open', isOpen);
+  if (btn) { btn.setAttribute('aria-expanded', isOpen); btn.textContent = isOpen ? '✕' : '≡'; }
+}
+function closeMobileSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) sidebar.classList.remove('mobile-open');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (overlay) overlay.classList.remove('open');
+  const btn = document.getElementById('mobileSidebarBtn');
+  if (btn) { btn.setAttribute('aria-expanded',false); btn.textContent='≡'; }
+}
+const _origSelectCat = selectCat;
+selectCat = function(id,el) { _origSelectCat(id,el); closeMobileSidebar(); };
+
+// ═══════════════════════════════════════════════════════════
+// ARROW KEY NAV BETWEEN COMPONENTS
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('detailBackdrop').classList.contains('open')) return;
+  if (!activeComp) return;
+  const cat = activeCategory==='all' ? COMPS : COMPS.filter(c=>c.cat===activeCategory);
+  const idx = cat.findIndex(c=>c.id===activeComp.id);
+  if (e.key==='ArrowRight'||e.key==='ArrowDown') {
+    e.preventDefault();
+    const next = cat[(idx+1)%cat.length];
+    if (next) { openDetail(next.id); showToast('→ '+next.name); }
+  } else if (e.key==='ArrowLeft'||e.key==='ArrowUp') {
+    e.preventDefault();
+    const prev = cat[(idx-1+cat.length)%cat.length];
+    if (prev) { openDetail(prev.id); showToast('← '+prev.name); }
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// WRAP openDetail to track recent
+// ═══════════════════════════════════════════════════════════
+const _origOpenDetail = openDetail;
+openDetail = function(id) { _origOpenDetail(id); trackRecent(id); };
+
+// ═══════════════════════════════════════════════════════════
+// SAVE TOAST
+// ═══════════════════════════════════════════════════════════
+const _origToggleSave = toggleSaveComp;
+toggleSaveComp = function(id) {
+  _origToggleSave(id);
+  const targetId = id || (activeComp ? activeComp.id : null);
+  if (targetId) showToast(savedIds.includes(targetId) ? '★ Saved to collection' : 'Removed from saved');
+};
+
+// ═══════════════════════════════════════════════════════════
+// RANDOM TOAST
+// ═══════════════════════════════════════════════════════════
+const _origRandom = randomComp;
+randomComp = function() { _origRandom(); if (activeComp) showToast('🎲 ' + activeComp.name); };
+
+// ═══════════════════════════════════════════════════════════
+// THEME TOAST
+// ═══════════════════════════════════════════════════════════
+const _origToggleTheme = toggleTheme;
+toggleTheme = function() {
+  _origToggleTheme();
+  const isDark = document.documentElement.dataset.theme==='dark';
+  showToast(isDark ? '☾ Dark mode' : '☀ Light mode');
+};
+
+// ═══════════════════════════════════════════════════════════
+// CHALLENGE PROGRESS BAR
+// ═══════════════════════════════════════════════════════════
+const _origUpdateTimer = updateChallengeTimer;
+updateChallengeTimer = function() {
+  _origUpdateTimer();
+  const pct = (challengeSecs/300)*100;
+  let bar = document.getElementById('challengeProgressBar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'challengeProgressBar';
+    bar.style.cssText = 'position:absolute;bottom:0;left:0;height:2px;background:var(--volt);transition:width 1s linear;pointer-events:none';
+    const cb = document.getElementById('challengeBar');
+    if (cb) { cb.style.position='relative'; cb.appendChild(bar); }
+  }
+  bar.style.width = pct+'%';
+  const timer = document.getElementById('challengeTimer');
+  if (timer) timer.style.color = challengeSecs<=30 ? 'var(--red)' : 'var(--volt)';
+};
+
+// ═══════════════════════════════════════════════════════════
+// SKELETON LOADING
+// ═══════════════════════════════════════════════════════════
+function showSkeletons(n=6) {
+  const area = document.getElementById('compArea');
+  if (!area) return;
+  area.className='comp-area comp-grid-view';
+  area.innerHTML=Array.from({length:n},()=>'<div class="skeleton-card"><div class="skeleton-block" style="height:100%"></div></div>').join('');
+}
+const _origRenderGrid = renderGrid;
+renderGrid = function(cat) {
+  showSkeletons();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>_origRenderGrid(cat)));
+};
+
+// ═══════════════════════════════════════════════════════════
+// SEARCH HIGHLIGHT
+// ═══════════════════════════════════════════════════════════
+const _origSearch = searchComps;
+searchComps = function(q) {
+  _origSearch(q);
+  if (!q.trim()) return;
+  const re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\$&')+')','gi');
+  document.querySelectorAll('.cc-name').forEach(el => {
+    const orig = el.textContent;
+    el.innerHTML = orig.replace(re,'<mark style="background:rgba(85,88,240,.3);color:var(--accent);padding:0 2px">$1</mark>');
+  });
+};
+
+// ═══════════════════════════════════════════════════════════
+// PAGE TITLE WITH COUNT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  document.title = 'UIBlocks — '+COMPS.length+' Components | Live Preview + Editor';
+});
+
+</script>
+
+</body>
+</html>
